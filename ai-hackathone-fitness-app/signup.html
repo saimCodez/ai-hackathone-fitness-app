@@ -12,7 +12,7 @@
 
   <title>AI Fitness Coach - Sign Up</title>
 
-
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
 
   <link
@@ -25,69 +25,54 @@
     href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&display=swap"
     rel="stylesheet"
   />
-<link
-  rel="stylesheet"
-  type="text/css"
-  href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"
-/>
 
-<script
-  type="text/javascript"
-  src="https://cdn.jsdelivr.net/npm/toastify-js">
-</script>
+  <!-- Toastify CSS -->
+  <link
+    rel="stylesheet"
+    type="text/css"
+    href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"
+  />
 
+  <!-- Toastify JS -->
+  <script
+    type="text/javascript"
+    src="https://cdn.jsdelivr.net/npm/toastify-js"
+  ></script>
+
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-
   <script>
-
     tailwind.config = {
-
       theme: {
-
         extend: {
 
           colors: {
-
             dark: '#0a0e14',
-
             surface: '#11181f',
-
             card: '#1a2330',
-
             borderDim: '#2a3645',
 
             primary: '#f97316',
-
             primarySoft: '#fb923c',
-
             primaryLight: '#fdba74',
 
             textLight: '#f1f5f9',
-
             textMuted: '#94a3b8',
-
           },
 
-
           fontFamily: {
-
             sans: [
               'Inter',
               'system-ui',
               'sans-serif'
             ]
-
           }
 
         }
-
       }
-
     };
-
   </script>
-
 
   <style>
 
@@ -95,18 +80,17 @@
       scroll-behavior: smooth;
     }
 
-
     body {
       background: #0a0e14;
     }
 
+    /* Glass Card */
 
     .glass-card {
 
       background: rgba(26, 35, 48, 0.7);
 
       backdrop-filter: blur(8px);
-
       -webkit-backdrop-filter: blur(8px);
 
       border: 1px solid rgba(42, 54, 69, 0.3);
@@ -118,19 +102,19 @@
 
     }
 
-
     .glass-card:hover {
 
       border-color: rgba(249, 115, 22, 0.4);
 
       box-shadow:
-        0 20px 40px -16px rgba(0,0,0,0.9),
-        0 0 0 1px rgba(249,115,22,0.1);
+        0 20px 40px -16px rgba(0, 0, 0, 0.9),
+        0 0 0 1px rgba(249, 115, 22, 0.1);
 
       transform: translateY(-4px);
 
     }
 
+    /* Hover lift */
 
     .hover-lift {
 
@@ -140,16 +124,16 @@
 
     }
 
-
     .hover-lift:hover {
 
-      transform: translateY(-6px);
+      transform: translateY(-4px);
 
       box-shadow:
-        0 20px 40px -12px rgba(249,115,22,0.25);
+        0 20px 40px -12px rgba(249, 115, 22, 0.25);
 
     }
 
+    /* Orange glow */
 
     .glow-orange {
 
@@ -158,35 +142,33 @@
 
     }
 
-
     @keyframes glowPulse {
 
       0%,
       100% {
 
         box-shadow:
-          0 0 20px rgba(249,115,22,0.15);
+          0 0 20px rgba(249, 115, 22, 0.15);
 
       }
 
       50% {
 
         box-shadow:
-          0 0 40px rgba(249,115,22,0.35);
+          0 0 35px rgba(249, 115, 22, 0.30);
 
       }
 
     }
 
+    /* Underline links */
 
     .link-underline {
 
       position: relative;
-
       display: inline-block;
 
     }
-
 
     .link-underline::after {
 
@@ -195,7 +177,6 @@
       position: absolute;
 
       bottom: -2px;
-
       left: 0;
 
       width: 0%;
@@ -214,13 +195,11 @@
 
     }
 
-
     .link-underline:hover::after {
-
       width: 100%;
-
     }
 
+    /* Scrollbar */
 
     ::-webkit-scrollbar {
 
@@ -230,7 +209,6 @@
 
     }
 
-
     ::-webkit-scrollbar-thumb {
 
       background: #f97316;
@@ -239,6 +217,7 @@
 
     }
 
+    /* Logo rings */
 
     .logo-ring {
 
@@ -247,14 +226,12 @@
 
     }
 
-
     .logo-ring-reverse {
 
       animation:
         spin 8s linear infinite reverse;
 
     }
-
 
     @keyframes spin {
 
@@ -268,6 +245,7 @@
 
     }
 
+    /* Input focus */
 
     input:focus {
 
@@ -275,13 +253,11 @@
 
     }
 
-
     input:focus-visible {
 
       outline: none !important;
 
     }
-
 
     .input-group input {
 
@@ -291,38 +267,29 @@
 
     }
 
-
     .input-group input:focus {
 
       border-color: #f97316 !important;
 
       box-shadow:
-        0 0 0 3px rgba(249,115,22,0.25),
+        0 0 0 3px rgba(249, 115, 22, 0.25),
         0 0 0 1px #f97316 !important;
 
     }
 
-
     *:focus {
-
       outline: none !important;
-
     }
-
 
     *:focus-visible {
-
       outline: none !important;
-
     }
-
 
     button:focus {
-
       outline: none !important;
-
     }
 
+    /* Floating logo */
 
     .float-logo {
 
@@ -331,24 +298,20 @@
 
     }
 
-
     @keyframes float {
 
       0%,
       100% {
-
         transform: translateY(0px);
-
       }
 
       50% {
-
-        transform: translateY(-10px);
-
+        transform: translateY(-8px);
       }
 
     }
 
+    /* Background decoration */
 
     .bg-decoration {
 
@@ -391,19 +354,23 @@
     class="mx-auto w-full max-w-md relative z-10"
   >
 
+    <!-- Smaller Card -->
+
     <div
-      class="glass-card rounded-[32px] p-8 sm:p-10 shadow-2xl border border-borderDim/30 hover-lift glow-orange"
+      class="glass-card rounded-[28px] p-6 sm:p-7 shadow-2xl border border-borderDim/30 hover-lift glow-orange"
     >
 
 
       <!-- Logo & Header -->
 
-      <div class="mb-8 text-center">
+      <div class="mb-5 text-center">
 
-        <div class="flex justify-center mb-4">
+        <div class="flex justify-center mb-3">
+
+          <!-- Smaller Logo -->
 
           <div
-            class="relative h-24 w-24 flex items-center justify-center float-logo flex-shrink-0"
+            class="relative h-20 w-20 flex items-center justify-center float-logo flex-shrink-0"
           >
 
             <div
@@ -415,7 +382,7 @@
             ></div>
 
             <div
-              class="h-16 w-16 rounded-2xl bg-primary flex items-center justify-center text-dark font-extrabold text-3xl shadow-lg shadow-primary/30 relative z-10"
+              class="h-14 w-14 rounded-2xl bg-primary flex items-center justify-center text-dark font-extrabold text-2xl shadow-lg shadow-primary/30 relative z-10"
             >
               AF
             </div>
@@ -434,7 +401,7 @@
           </div>
 
           <div
-            class="text-2xl sm:text-3xl font-extrabold text-textLight mt-1"
+            class="text-xl sm:text-2xl font-extrabold text-textLight mt-1"
           >
             Start your journey
           </div>
@@ -442,7 +409,7 @@
         </div>
 
 
-        <p class="mt-3 text-sm text-textMuted">
+        <p class="mt-2 text-sm text-textMuted">
 
           Create your account and build a plan around
           your goals with daily coaching and progress tracking.
@@ -454,7 +421,7 @@
 
       <!-- Back to Home -->
 
-      <div class="mb-6 text-center">
+      <div class="mb-4 text-center">
 
         <a
           href="index.html"
@@ -470,7 +437,7 @@
 
       <form
         id="signup-form"
-        class="space-y-5"
+        class="space-y-4"
         novalidate
       >
 
@@ -491,7 +458,7 @@
             name="name"
             type="text"
             required
-            class="mt-2 block w-full min-w-0 rounded-2xl border border-borderDim/50 bg-card/30 px-4 py-3 text-textLight placeholder:text-textMuted/50 transition-all duration-300"
+            class="mt-2 block w-full min-w-0 rounded-2xl border border-borderDim/50 bg-card/30 px-4 py-2.5 text-textLight placeholder:text-textMuted/50 transition-all duration-300"
             aria-describedby="signup-name-error"
             placeholder="John Doe"
           />
@@ -521,7 +488,7 @@
             name="email"
             type="email"
             required
-            class="mt-2 block w-full min-w-0 rounded-2xl border border-borderDim/50 bg-card/30 px-4 py-3 text-textLight placeholder:text-textMuted/50 transition-all duration-300"
+            class="mt-2 block w-full min-w-0 rounded-2xl border border-borderDim/50 bg-card/30 px-4 py-2.5 text-textLight placeholder:text-textMuted/50 transition-all duration-300"
             aria-describedby="signup-email-error"
             placeholder="you@example.com"
           />
@@ -538,7 +505,7 @@
         <!-- Passwords -->
 
         <div
-          class="grid grid-cols-1 sm:grid-cols-2 gap-4"
+          class="grid grid-cols-1 sm:grid-cols-2 gap-3"
         >
 
 
@@ -558,7 +525,7 @@
               name="password"
               type="password"
               required
-              class="mt-2 block w-full min-w-0 rounded-2xl border border-borderDim/50 bg-card/30 px-4 py-3 text-textLight placeholder:text-textMuted/50 transition-all duration-300"
+              class="mt-2 block w-full min-w-0 rounded-2xl border border-borderDim/50 bg-card/30 px-4 py-2.5 text-textLight placeholder:text-textMuted/50 transition-all duration-300"
               aria-describedby="signup-password-error"
               placeholder="••••••••"
             />
@@ -588,7 +555,7 @@
               name="passwordConfirm"
               type="password"
               required
-              class="mt-2 block w-full min-w-0 rounded-2xl border border-borderDim/50 bg-card/30 px-4 py-3 text-textLight placeholder:text-textMuted/50 transition-all duration-300"
+              class="mt-2 block w-full min-w-0 rounded-2xl border border-borderDim/50 bg-card/30 px-4 py-2.5 text-textLight placeholder:text-textMuted/50 transition-all duration-300"
               aria-describedby="signup-password-confirm-error"
               placeholder="••••••••"
             />
@@ -608,7 +575,7 @@
 
         <button
           type="submit"
-          class="mt-2 w-full inline-flex justify-center px-5 py-3.5 bg-primary text-dark font-bold rounded-2xl shadow-xl shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5 transition-all duration-300 text-base focus:outline-none focus:ring-2 focus:ring-primary/50"
+          class="mt-1 w-full inline-flex justify-center px-5 py-3 bg-primary text-dark font-bold rounded-2xl shadow-xl shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5 transition-all duration-300 text-base focus:outline-none focus:ring-2 focus:ring-primary/50"
         >
           CREATE ACCOUNT →
         </button>
@@ -618,7 +585,7 @@
 
       <!-- Login -->
 
-      <p class="mt-6 text-center text-sm text-textMuted">
+      <p class="mt-5 text-center text-sm text-textMuted">
 
         Already have an account?
 
