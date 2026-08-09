@@ -1,0 +1,271 @@
+/* Premium Dark Fitness - AI Fitness Coach CSS */
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  font-family: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Smooth scrolling and accessibility */
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ============================================================
+   FLOATING ANIMATION
+   ============================================================ */
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* ============================================================
+   PREMIUM CARD EFFECTS
+   ============================================================ */
+
+.card-hover {
+  transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-hover:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 24px 48px rgba(255, 212, 0, 0.15);
+}
+
+/* ============================================================
+   UTILITY CLASSES
+   ============================================================ */
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Prevent horizontal overflow */
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+/* Image optimization */
+img, svg {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ============================================================
+   RESPONSIVE IMPROVEMENTS
+   ============================================================ */
+
+@media (max-width: 768px) {
+  body {
+    font-size: 15px;
+  }
+
+  /* Adjust navbar on mobile */
+  header {
+    padding: 12px 16px;
+  }
+
+  /* Adjust hero text sizes */
+  h1 {
+    font-size: clamp(1.875rem, 5vw, 3.5rem) !important;
+  }
+
+  h2 {
+    font-size: clamp(1.875rem, 4vw, 3.75rem) !important;
+  }
+
+  /* Adjust padding */
+  section {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Extra small screens */
+  h1 {
+    font-size: clamp(1.5rem, 4vw, 2.5rem) !important;
+  }
+
+  h2 {
+    font-size: clamp(1.5rem, 3.5vw, 2.5rem) !important;
+  }
+
+  /* Remove floating cards on very small screens */
+  .animate-float {
+    animation: none;
+  }
+
+  /* Stack everything vertically */
+  .md\:grid-cols-2 {
+    grid-template-columns: 1fr !important;
+  }
+
+  .md\:col-span-6 {
+    grid-column: auto !important;
+  }
+}
+
+/* ============================================================
+   TEXT SELECTION
+   ============================================================ */
+
+::selection {
+  background-color: #FFD400;
+  color: #0b0f12;
+}
+
+::-moz-selection {
+  background-color: #FFD400;
+  color: #0b0f12;
+}
+
+/* ============================================================
+   SCROLLBAR STYLING
+   ============================================================ */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(15, 23, 36, 0.5);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #FFD400;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #FFF200;
+}
+
+/* ============================================================
+   FORM ELEMENTS
+   ============================================================ */
+
+input, button, textarea, select {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+}
+
+/* ============================================================
+   LINK STYLES
+   ============================================================ */
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: all 300ms ease;
+}
+
+a:hover {
+  text-decoration: none;
+}
+
+/* ============================================================
+   BUTTON RESET
+   ============================================================ */
+
+button {
+  border: none;
+  background: none;
+  cursor: pointer;
+  transition: all 300ms ease;
+}
+
+/* ============================================================
+   GRADIENTS & BACKGROUNDS
+   ============================================================ */
+
+.bg-gradient-to-r {
+  background-image: linear-gradient(to right, var(--tw-gradient-stops));
+}
+
+.bg-gradient-to-b {
+  background-image: linear-gradient(to bottom, var(--tw-gradient-stops));
+}
+
+.bg-gradient-to-br {
+  background-image: linear-gradient(to bottom right, var(--tw-gradient-stops));
+}
+
+.bg-gradient-to-t {
+  background-image: linear-gradient(to top, var(--tw-gradient-stops));
+}
+
+/* ============================================================
+   BACKDROP BLUR
+   ============================================================ */
+
+.backdrop-blur-sm {
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+
+.backdrop-blur-md {
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+
+.backdrop-blur-xl {
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+}
+
+/* ============================================================
+   CUSTOM ANIMATIONS
+   ============================================================ */
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}

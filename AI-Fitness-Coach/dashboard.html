@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Fitness Coach - Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            dark: '#0a0e14',
+            surface: '#11181f',
+            card: '#1a2330',
+            borderDim: '#2a3645',
+            primary: '#f97316',
+            primarySoft: '#fb923c',
+            primaryLight: '#fdba74',
+            textLight: '#f1f5f9',
+            textMuted: '#94a3b8',
+          },
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+        }
+      }
+    }
+  </script>
+  <style>
+    * { scroll-behavior: smooth; }
+    body { background: #0a0e14; }
+
+    .logo-ring {
+      animation: spin 12s linear infinite;
+    }
+    .logo-ring-reverse {
+      animation: spin 8s linear infinite reverse;
+    }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .float-logo {
+      animation: float 6s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .bg-decoration {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .navbar-glass {
+      background: rgba(17, 24, 31, 0.7);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(42, 54, 69, 0.3);
+    }
+
+    .glass-card {
+      background: rgba(26, 35, 48, 0.5);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(42, 54, 69, 0.3);
+      transition: all 0.3s ease;
+    }
+    .glass-card:hover {
+      border-color: rgba(249, 115, 22, 0.3);
+      transform: translateY(-2px);
+      box-shadow: 0 20px 40px -12px rgba(249, 115, 22, 0.1);
+    }
+
+    .glow-pulse {
+      animation: glowPulse 3s ease-in-out infinite;
+    }
+    @keyframes glowPulse {
+      0%, 100% { box-shadow: 0 0 20px rgba(249, 115, 22, 0.05); }
+      50% { box-shadow: 0 0 40px rgba(249, 115, 22, 0.15); }
+    }
+
+    .stat-card {
+      transition: all 0.3s ease;
+      cursor: default;
+    }
+    .stat-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(249, 115, 22, 0.4);
+      box-shadow: 0 20px 40px -12px rgba(249, 115, 22, 0.15);
+    }
+
+    .progress-bar {
+      transition: width 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    .btn-primary {
+      transition: all 0.3s ease;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 20px 40px -12px rgba(249, 115, 22, 0.3);
+    }
+
+    .goal-option {
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    .goal-option:hover {
+      border-color: #f97316;
+      transform: translateY(-3px);
+      box-shadow: 0 20px 40px -12px rgba(249, 115, 22, 0.15);
+    }
+    .goal-option.active {
+      border-color: #f97316;
+      background: rgba(249, 115, 22, 0.12);
+      box-shadow: 0 0 30px -8px rgba(249, 115, 22, 0.15);
+    }
+
+    .habit-checkbox {
+      accent-color: #f97316;
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+    .habit-checkbox:checked + span {
+      color: #f97316;
+    }
+
+    button:focus, input:focus {
+      outline: none !important;
+    }
+    button:focus-visible, input:focus-visible {
+      outline: none !important;
+    }
+    *:focus {
+      outline: none !important;
+    }
+    *:focus-visible {
+      outline: none !important;
+    }
+
+    ::-webkit-scrollbar { width: 6px; background: #11181f; }
+    ::-webkit-scrollbar-thumb { background: #f97316; border-radius: 40px; }
+
+    .workout-card-dash {
+      transition: all 0.3s ease;
+    }
+    .workout-card-dash:hover {
+      transform: translateY(-3px);
+      border-color: rgba(249, 115, 22, 0.3);
+      box-shadow: 0 20px 40px -12px rgba(249, 115, 22, 0.1);
+    }
+
+    .link-underline {
+      position: relative;
+      display: inline-block;
+    }
+    .link-underline::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 0%;
+      height: 2px;
+      background: #f97316;
+      transition: width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    .link-underline:hover::after {
+      width: 100%;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-dark text-textLight antialiased">
+
+  <!-- Background decorations -->
+  <div class="bg-decoration w-96 h-96 bg-primary/5 top-20 -left-20"></div>
+  <div class="bg-decoration w-96 h-96 bg-primary/5 bottom-20 -right-20"></div>
+  <div class="bg-decoration w-64 h-64 bg-primary/3 top-1/2 left-1/2 -translate-x-1/2"></div>
+
+  <!-- ===== NAVBAR ===== -->
+  <header class="navbar-glass sticky top-0 z-50">
+    <nav class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-3 group relative">
+        <div class="relative h-11 w-11 flex items-center justify-center float-logo">
+          <div class="absolute inset-0 rounded-full border-2 border-primary/30 logo-ring"></div>
+          <div class="absolute inset-0 rounded-full border-2 border-transparent border-t-primary/60 logo-ring-reverse"></div>
+          <div class="h-9 w-9 rounded-xl bg-primary flex items-center justify-center text-dark font-black text-sm shadow-lg shadow-primary/30 group-hover:shadow-primary/50 transition-all relative z-10">AF</div>
+        </div>
+        <div class="hidden sm:block leading-tight">
+          <div class="text-sm font-black tracking-tight">AI FITNESS</div>
+          <div class="text-[10px] font-bold uppercase tracking-[0.18em] text-textMuted">premium coach</div>
+        </div>
+      </a>
+
+      <div class="hidden xl:flex items-center gap-6 text-sm font-medium">
+        <a href="#overview" class="text-textMuted hover:text-primary transition-colors link-underline">Overview</a>
+        <a href="#workouts" class="text-textMuted hover:text-primary transition-colors link-underline">Workouts</a>
+        <a href="#diet" class="text-textMuted hover:text-primary transition-colors link-underline">Nutrition</a>
+        <a href="#habits" class="text-textMuted hover:text-primary transition-colors link-underline">Habits</a>
+        <a href="#progress" class="text-textMuted hover:text-primary transition-colors link-underline">Progress</a>
+        <a href="#coach" class="text-textMuted hover:text-primary transition-colors link-underline">AI Coach</a>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <div class="hidden sm:block text-right">
+          <div class="text-sm font-semibold">Hi, <span id="user-name">Guest</span></div>
+          <div class="text-xs text-textMuted">Member</div>
+        </div>
+        <button id="logout-btn" class="px-4 py-2 rounded-xl border border-borderDim/40 text-sm text-textMuted hover:text-primary hover:border-primary/50 transition-all">Logout</button>
+      </div>
+    </nav>
+  </header>
+
+  <!-- ===== MAIN ===== -->
+  <main class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-6">
+
+    <!-- Welcome Hero -->
+    <section id="overview" class="mb-8">
+      <div class="relative overflow-hidden rounded-3xl glass-card p-8 sm:p-10 shadow-2xl glow-pulse">
+        <div class="absolute -top-32 -right-32 w-80 h-80 bg-primary/10 rounded-full blur-3xl"></div>
+        <div class="relative z-10">
+          <span class="text-xs font-bold text-primary tracking-[0.25em] uppercase">× your fitness dashboard</span>
+          <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight mt-3">
+            Ready to <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-primaryLight">make progress?</span>
+          </h1>
+          <p class="text-textMuted mt-3 max-w-2xl text-base sm:text-lg">Your personalized fitness journey is ready. Track your habits, workouts, nutrition and progress all in one place.</p>
+
+          <div class="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="rounded-2xl bg-dark/50 border border-borderDim/30 p-5">
+              <div class="text-xs text-textMuted uppercase tracking-wider">Your Goal</div>
+              <div id="current-goal" class="text-xl font-black text-primary mt-1">—</div>
+            </div>
+            <div class="rounded-2xl bg-dark/50 border border-borderDim/30 p-5">
+              <div class="text-xs text-textMuted uppercase tracking-wider">Current Streak</div>
+              <div id="streak-count" class="text-3xl font-black text-primaryLight mt-1">0</div>
+              <div class="text-xs text-textMuted">days</div>
+            </div>
+            <div class="rounded-2xl bg-dark/50 border border-borderDim/30 p-5">
+              <div class="text-xs text-textMuted uppercase tracking-wider">Today's Progress</div>
+              <div id="today-progress" class="text-xl font-black text-primary mt-1">0%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quick Stats -->
+    <section class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+      <div class="stat-card rounded-2xl border border-borderDim/30 bg-card/50 p-5 shadow-xl">
+        <div class="flex items-center justify-between"><span class="text-[10px] font-bold text-primary tracking-widest uppercase">BMI</span><span class="text-2xl">⚖️</span></div>
+        <div id="bmi-result" class="text-3xl font-black text-primary mt-2">—</div>
+        <div class="text-xs text-textMuted">Your result</div>
+      </div>
+      <div class="stat-card rounded-2xl border border-borderDim/30 bg-card/50 p-5 shadow-xl">
+        <div class="flex items-center justify-between"><span class="text-[10px] font-bold text-primary tracking-widest uppercase">Calories</span><span class="text-2xl">🔥</span></div>
+        <div id="calorie-result" class="text-3xl font-black text-primary mt-2">—</div>
+        <div class="text-xs text-textMuted">Daily target</div>
+      </div>
+      <div class="stat-card rounded-2xl border border-borderDim/30 bg-card/50 p-5 shadow-xl">
+        <div class="flex items-center justify-between"><span class="text-[10px] font-bold text-primaryLight tracking-widest uppercase">Streak</span><span class="text-2xl">🔥</span></div>
+        <div id="streak-display" class="text-3xl font-black text-primaryLight mt-2">0</div>
+        <div class="text-xs text-textMuted">Keep going!</div>
+      </div>
+      <div class="stat-card rounded-2xl border border-borderDim/30 bg-card/50 p-5 shadow-xl">
+        <div class="flex items-center justify-between"><span class="text-[10px] font-bold text-primary tracking-widest uppercase">Progress</span><span class="text-2xl">📊</span></div>
+        <div id="today-progress-card" class="text-3xl font-black text-primary mt-2">0%</div>
+        <div class="text-xs text-textMuted">Today's activity</div>
+      </div>
+    </section>
+
+    <!-- Daily Tracking -->
+    <section id="habits" class="mb-10">
+      <div class="mb-5"><span class="text-xs font-bold text-primary tracking-[0.25em] uppercase">× daily tracking</span><h2 class="text-3xl sm:text-4xl font-black mt-1">Today's Progress</h2><p class="text-textMuted mt-1">Keep track of the essentials and build consistency.</p></div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <!-- Water -->
+        <div class="glass-card rounded-3xl p-6">
+          <div class="flex items-center justify-between"><div><div class="text-[10px] font-bold text-primary tracking-widest uppercase">Water</div><div id="water-count" class="text-3xl font-black mt-1">0 / 8</div></div><div class="text-4xl">💧</div></div>
+          <div class="mt-4 flex gap-2"><button id="water-minus" class="w-10 h-10 rounded-xl border border-borderDim/40 hover:border-primary hover:text-primary transition">−</button><button id="water-plus" class="w-10 h-10 rounded-xl bg-primary text-dark font-black">+</button></div>
+          <div class="mt-4 h-2 bg-borderDim/40 rounded-full overflow-hidden"><div id="water-progress" class="h-full bg-gradient-to-r from-primary to-primaryLight progress-bar" style="width:0%"></div></div>
+        </div>
+
+        <!-- Meals -->
+        <div class="glass-card rounded-3xl p-6">
+          <div class="flex items-center justify-between"><div><div class="text-[10px] font-bold text-primaryLight tracking-widest uppercase">Meals</div><div id="meals-count" class="text-3xl font-black mt-1">0 / 3</div></div><div class="text-4xl">🥗</div></div>
+          <div class="mt-4 flex gap-2"><button id="meal-minus" class="w-10 h-10 rounded-xl border border-borderDim/40 hover:border-primaryLight hover:text-primaryLight transition">−</button><button id="meal-plus" class="w-10 h-10 rounded-xl bg-primaryLight text-dark font-black">+</button></div>
+          <div class="mt-4 h-2 bg-borderDim/40 rounded-full overflow-hidden"><div id="meal-progress" class="h-full bg-gradient-to-r from-primaryLight to-primary progress-bar" style="width:0%"></div></div>
+        </div>
+
+        <!-- Workout -->
+        <div class="glass-card rounded-3xl p-6 border-primary/20 bg-gradient-to-br from-primary/10 to-card">
+          <div class="flex items-center justify-between"><div><div class="text-[10px] font-bold text-primary tracking-widest uppercase">Workout</div><div id="workout-status" class="text-xl font-black mt-1">Not Started</div></div><div class="text-4xl">💪</div></div>
+          <button id="start-workout" class="mt-4 px-5 py-2.5 bg-primary text-dark font-bold rounded-xl btn-primary">START WORKOUT →</button>
+          <div class="mt-4 h-2 bg-borderDim/40 rounded-full overflow-hidden"><div id="workout-progress" class="h-full bg-gradient-to-r from-primary to-primaryLight progress-bar" style="width:0%"></div></div>
+        </div>
+      </div>
+
+      <!-- Daily Habits -->
+      <div class="mt-5 glass-card rounded-3xl p-6">
+        <div class="flex items-center gap-3"><span class="text-3xl">🎯</span><div><h3 class="font-black text-xl">Daily Habits</h3><p class="text-sm text-textMuted">Small actions create big results.</p></div></div>
+        <ul id="habit-list" class="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <li class="p-3 rounded-xl bg-dark/50 border border-borderDim/30"><label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" class="habit-checkbox" data-habit="water"><span class="text-sm">💧 Drink enough water</span></label></li>
+          <li class="p-3 rounded-xl bg-dark/50 border border-borderDim/30"><label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" class="habit-checkbox" data-habit="food"><span class="text-sm">🥗 Eat balanced meals</span></label></li>
+          <li class="p-3 rounded-xl bg-dark/50 border border-borderDim/30"><label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" class="habit-checkbox" data-habit="workout"><span class="text-sm">💪 Complete your workout</span></label></li>
+          <li class="p-3 rounded-xl bg-dark/50 border border-borderDim/30"><label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" class="habit-checkbox" data-habit="sleep"><span class="text-sm">😴 Get enough rest</span></label></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Goal Selector -->
+    <section class="mb-10">
+      <div class="glass-card rounded-3xl p-7">
+        <span class="text-xs font-bold text-primary tracking-[0.25em] uppercase">× your focus</span>
+        <h2 class="text-3xl font-black mt-1">Fitness Goal</h2>
+        <p class="text-textMuted mt-1">Choose the area you want to focus on.</p>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-5">
+          <button data-goal="lose" class="goal-option text-left rounded-2xl border border-borderDim/40 bg-dark/40 p-4"><div class="text-2xl">🎯</div><div class="font-bold mt-2">Lose Weight</div><div class="text-xs text-textMuted">Build healthy habits</div></button>
+          <button data-goal="strength" class="goal-option text-left rounded-2xl border border-borderDim/40 bg-dark/40 p-4"><div class="text-2xl">💪</div><div class="font-bold mt-2">Build Strength</div><div class="text-xs text-textMuted">Focus on strength</div></button>
+          <button data-goal="active" class="goal-option text-left rounded-2xl border border-borderDim/40 bg-dark/40 p-4"><div class="text-2xl">🏃</div><div class="font-bold mt-2">Stay Active</div><div class="text-xs text-textMuted">Keep moving daily</div></button>
+          <button data-goal="fitness" class="goal-option text-left rounded-2xl border border-borderDim/40 bg-dark/40 p-4"><div class="text-2xl">⚡</div><div class="font-bold mt-2">Improve Fitness</div><div class="text-xs text-textMuted">Improve overall</div></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Workouts + Diet -->
+    <section class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10">
+      <!-- Workouts -->
+      <div id="workouts" class="lg:col-span-2">
+        <div class="mb-4"><span class="text-xs font-bold text-primary tracking-[0.25em] uppercase">× training programs</span><h2 class="text-3xl font-black mt-1">Workout Plans</h2></div>
+        <div id="workout-list" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="workout-card-dash rounded-2xl border border-borderDim/30 bg-card/50 p-5">
+            <div class="text-[10px] text-primary font-bold uppercase">Beginner</div>
+            <div class="font-black text-lg mt-1">Full Body Starter</div>
+            <div class="text-sm text-textMuted">20 min • 5 exercises</div>
+            <div class="flex gap-2 mt-4">
+              <button id="workout-plan-start" class="px-4 py-2 bg-primary text-dark font-bold rounded-xl text-sm">Start</button>
+              <button id="workout-plan-complete" class="px-4 py-2 border border-borderDim/40 rounded-xl text-sm">Complete</button>
+            </div>
+          </div>
+          <div class="workout-card-dash rounded-2xl border border-borderDim/30 bg-card/50 p-5">
+            <div class="text-[10px] text-primaryLight font-bold uppercase">Active</div>
+            <div class="font-black text-lg mt-1">Cardio & Mobility</div>
+            <div class="text-sm text-textMuted">25 min • 6 exercises</div>
+            <div class="flex gap-2 mt-4">
+              <button class="workout-start px-4 py-2 bg-primary text-dark font-bold rounded-xl text-sm">Start</button>
+              <button class="workout-complete px-4 py-2 border border-borderDim/40 rounded-xl text-sm">Complete</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Diet -->
+      <aside id="diet">
+        <div class="mb-4"><span class="text-xs font-bold text-primaryLight tracking-[0.25em] uppercase">× nutrition</span><h2 class="text-3xl font-black mt-1">Diet & Meals</h2></div>
+        <div id="diet-list" class="space-y-3">
+          <div class="rounded-2xl border border-borderDim/30 bg-card/50 p-4"><div class="flex items-center justify-between"><div><div class="text-[10px] text-textMuted">Breakfast</div><div class="font-bold">Balanced Breakfast</div></div><span class="text-2xl">🍳</span></div></div>
+          <div class="rounded-2xl border border-borderDim/30 bg-card/50 p-4"><div class="flex items-center justify-between"><div><div class="text-[10px] text-textMuted">Lunch</div><div class="font-bold">Protein & Veggies</div></div><span class="text-2xl">🥗</span></div></div>
+          <div class="rounded-2xl border border-borderDim/30 bg-card/50 p-4"><div class="flex items-center justify-between"><div><div class="text-[10px] text-textMuted">Dinner</div><div class="font-bold">Light Balanced</div></div><span class="text-2xl">🍽️</span></div></div>
+          <div class="rounded-2xl border border-borderDim/30 bg-card/50 p-4"><div class="flex items-center justify-between"><div><div class="text-[10px] text-textMuted">Snack</div><div class="font-bold">Healthy Snack</div></div><span class="text-2xl">🍎</span></div></div>
+        </div>
+      </aside>
+    </section>
+
+    <!-- Weekly Progress -->
+    <section id="progress" class="mb-10">
+      <div class="text-center mb-8"><span class="text-xs font-bold text-primary tracking-[0.25em] uppercase">× your progress</span><h2 class="text-4xl sm:text-5xl font-black mt-1">Real Progress. <span class="text-primary">Real Results.</span></h2><p class="text-textMuted mt-2">Track your consistency and watch your progress grow.</p></div>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div class="rounded-2xl border border-borderDim/30 bg-card/50 p-5 text-center"><div class="text-2xl mb-2">💪</div><div class="text-[10px] text-primary font-bold uppercase">Workouts</div><div id="weekly-workouts" class="text-3xl font-black mt-1">0</div></div>
+        <div class="rounded-2xl border border-borderDim/30 bg-card/50 p-5 text-center"><div class="text-2xl mb-2">💧</div><div class="text-[10px] text-primary font-bold uppercase">Water</div><div id="weekly-water" class="text-3xl font-black mt-1">0</div></div>
+        <div class="rounded-2xl border border-borderDim/30 bg-card/50 p-5 text-center"><div class="text-2xl mb-2">🥗</div><div class="text-[10px] text-primaryLight font-bold uppercase">Meals</div><div id="weekly-meals" class="text-3xl font-black mt-1">0</div></div>
+        <div class="rounded-2xl border border-borderDim/30 bg-card/50 p-5 text-center"><div class="text-2xl mb-2">🎯</div><div class="text-[10px] text-primary font-bold uppercase">Habits</div><div id="weekly-habits" class="text-3xl font-black mt-1">0</div></div>
+      </div>
+    </section>
+
+    <!-- AI Coach -->
+    <section id="coach" class="mb-10">
+      <div class="text-center mb-8"><span class="text-xs font-bold text-primary tracking-[0.25em] uppercase">× AI coaching</span><h2 class="text-4xl sm:text-5xl font-black mt-1">Your Personal <span class="text-primary">AI Coach</span></h2><p class="text-textMuted mt-2">Ask questions, get guidance and stay motivated.</p></div>
+      <div class="max-w-4xl mx-auto rounded-3xl border border-borderDim/30 overflow-hidden shadow-2xl glass-card">
+        <div class="bg-gradient-to-r from-primary/10 to-primaryLight/5 border-b border-borderDim/30 p-5 flex items-center gap-4"><div class="w-11 h-11 rounded-xl bg-primary/20 flex items-center justify-center text-xl">🤖</div><div><div class="font-black">AI Fitness Coach</div><div class="text-sm text-textMuted">Your personal fitness assistant</div></div></div>
+        <div id="chatbot-messages" class="h-72 overflow-y-auto bg-dark/40 p-5 space-y-3"><div class="flex gap-3"><div class="w-7 h-7 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 text-xs">🤖</div><div class="max-w-md glass-card rounded-2xl p-3"><div class="text-sm">How can I help with your fitness journey today?</div></div></div></div>
+        <div class="bg-surface border-t border-borderDim/30 p-4 flex gap-3"><input id="chat-input" type="text" placeholder="Ask your AI coach..." class="flex-1 rounded-full bg-card/50 border border-borderDim/30 px-5 py-3 text-sm text-textLight placeholder-textMuted focus:border-primary transition"><button id="chat-send" class="px-6 py-3 bg-primary text-dark font-bold rounded-full btn-primary">Send</button></div>
+      </div>
+    </section>
+
+    <!-- Final CTA -->
+    <section><div class="relative overflow-hidden rounded-3xl border border-primary/20 bg-gradient-to-br from-primary/10 via-card to-card p-10 text-center shadow-2xl"><div class="relative z-10"><div class="text-5xl mb-4">⚡</div><h2 class="text-4xl sm:text-5xl font-black">Keep Going. <span class="text-primary">Stay Consistent.</span></h2><p class="text-textMuted max-w-xl mx-auto mt-3">Every workout and every healthy habit brings you one step closer to your goal.</p></div></div></section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="relative z-10 border-t border-borderDim/30 mt-8 px-4 py-6">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div class="flex items-center gap-3"><div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-dark font-black text-sm">AF</div><div><div class="font-bold text-sm">AI FITNESS COACH</div><div class="text-[10px] text-textMuted">Premium Training</div></div></div>
+      <div class="text-sm text-textMuted">© 2026 AI Fitness Coach. All rights reserved.</div>
+    </div>
+  </footer>
+
+  <!-- Dashboard JavaScript -->
+  <script src="js/dashboard.js"></script>
+
+</body>
+</html>

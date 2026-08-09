@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Workout Plan | AI Fitness Coach</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            dark: '#0a0e14',
+            surface: '#11181f',
+            card: '#1a2330',
+            borderDim: '#2a3645',
+            primary: '#f97316',
+            primarySoft: '#fb923c',
+            primaryLight: '#fdba74',
+            textLight: '#f1f5f9',
+            textMuted: '#94a3b8',
+          },
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+        }
+      }
+    }
+  </script>
+  <style>
+    * { scroll-behavior: smooth; }
+    body { background: #0a0e14; }
+
+    /* spinning ring */
+    .logo-ring {
+      animation: spin 12s linear infinite;
+    }
+    .logo-ring-reverse {
+      animation: spin 8s linear infinite reverse;
+    }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    /* floating animation for logo */
+    .float-logo {
+      animation: float 6s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+
+    /* background decoration */
+    .bg-decoration {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* navbar */
+    .navbar-glass {
+      background: rgba(17, 24, 31, 0.7);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(42, 54, 69, 0.3);
+    }
+
+    /* workout card */
+    .workout-card {
+      transition: all 0.3s ease;
+      cursor: pointer;
+      border: 2px solid rgba(42, 54, 69, 0.3);
+      background: rgba(26, 35, 48, 0.5);
+      backdrop-filter: blur(4px);
+    }
+    .workout-card:hover {
+      border-color: rgba(249, 115, 22, 0.4);
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px -12px rgba(249, 115, 22, 0.15);
+    }
+    .workout-card.selected {
+      border-color: #f97316;
+      background: rgba(249, 115, 22, 0.12);
+      box-shadow: 0 0 30px -8px rgba(249, 115, 22, 0.2), inset 0 0 30px -8px rgba(249, 115, 22, 0.05);
+    }
+    .workout-card .check-mark {
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .workout-card.selected .check-mark {
+      opacity: 1;
+    }
+    .workout-card ul li {
+      opacity: 0.7;
+      transition: opacity 0.3s ease;
+    }
+    .workout-card.selected ul li {
+      opacity: 1;
+    }
+
+    /* FIX: Remove default white outline on focus */
+    button:focus {
+      outline: none !important;
+    }
+    button:focus-visible {
+      outline: none !important;
+    }
+    *:focus {
+      outline: none !important;
+    }
+    *:focus-visible {
+      outline: none !important;
+    }
+
+    ::-webkit-scrollbar { width: 6px; background: #11181f; }
+    ::-webkit-scrollbar-thumb { background: #f97316; border-radius: 40px; }
+  </style>
+</head>
+<body class="min-h-screen bg-dark text-textLight antialiased">
+
+  <!-- Background decorations -->
+  <div class="bg-decoration w-96 h-96 bg-primary/5 top-20 -left-20"></div>
+  <div class="bg-decoration w-96 h-96 bg-primary/5 bottom-20 -right-20"></div>
+
+  <!-- ===== NAVBAR ===== -->
+  <header class="navbar-glass sticky top-0 z-50">
+    <nav class="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-3 group relative">
+        <div class="relative h-11 w-11 flex items-center justify-center float-logo">
+          <div class="absolute inset-0 rounded-full border-2 border-primary/30 logo-ring"></div>
+          <div class="absolute inset-0 rounded-full border-2 border-transparent border-t-primary/60 logo-ring-reverse"></div>
+          <div class="h-9 w-9 rounded-xl bg-primary flex items-center justify-center text-dark font-black text-sm shadow-lg shadow-primary/30 group-hover:shadow-primary/50 transition-all relative z-10">AF</div>
+        </div>
+        <div class="hidden sm:block leading-tight">
+          <div class="text-sm font-black tracking-tight">AI FITNESS</div>
+          <div class="text-[10px] font-bold uppercase tracking-[0.18em] text-textMuted">premium coach</div>
+        </div>
+      </a>
+      <div class="text-sm font-medium text-textMuted bg-card/50 px-4 py-2 rounded-full border border-borderDim/30">
+        Step 5 of 5
+      </div>
+    </nav>
+  </header>
+
+  <!-- ===== MAIN ===== -->
+  <main class="min-h-[calc(100vh-80px)] flex items-center justify-center px-4 py-8 sm:py-12">
+    <div class="w-full max-w-5xl relative z-10">
+
+      <!-- Heading -->
+      <div class="text-center mb-10">
+        <span class="text-xs font-bold text-primary tracking-[0.25em] uppercase">× your workout</span>
+        <h1 class="text-3xl sm:text-4xl md:text-5xl font-black mt-3 text-textLight">
+          Choose Your Workout Plan
+        </h1>
+        <p class="text-textMuted mt-3 text-sm sm:text-base">
+          Select a workout level that matches your current fitness experience.
+        </p>
+      </div>
+
+      <!-- Workout Cards -->
+      <div id="workout-container" class="grid grid-cols-1 md:grid-cols-3 gap-5">
+
+        <!-- Beginner -->
+        <button type="button" data-workout="Beginner" class="workout-card rounded-2xl p-6 sm:p-7 text-left relative">
+          <div class="absolute top-3 right-3 w-6 h-6 rounded-full bg-primary flex items-center justify-center check-mark">
+            <svg class="w-4 h-4 text-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+          </div>
+          <div class="text-4xl mb-4">🌱</div>
+          <h2 class="text-xl sm:text-2xl font-black text-textLight">Beginner</h2>
+          <p class="text-textMuted mt-2 text-sm">Perfect if you are new to exercise.</p>
+          <ul class="mt-4 space-y-1.5 text-sm text-textMuted">
+            <li>✓ 20–30 minute workouts</li>
+            <li>✓ Basic exercises</li>
+            <li>✓ 3 days per week</li>
+          </ul>
+        </button>
+
+        <!-- Intermediate -->
+        <button type="button" data-workout="Intermediate" class="workout-card rounded-2xl p-6 sm:p-7 text-left relative">
+          <div class="absolute top-3 right-3 w-6 h-6 rounded-full bg-primary flex items-center justify-center check-mark">
+            <svg class="w-4 h-4 text-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+          </div>
+          <div class="text-4xl mb-4">🔥</div>
+          <h2 class="text-xl sm:text-2xl font-black text-textLight">Intermediate</h2>
+          <p class="text-textMuted mt-2 text-sm">For users with some workout experience.</p>
+          <ul class="mt-4 space-y-1.5 text-sm text-textMuted">
+            <li>✓ 30–45 minute workouts</li>
+            <li>✓ Strength + cardio</li>
+            <li>✓ 4 days per week</li>
+          </ul>
+        </button>
+
+        <!-- Advanced -->
+        <button type="button" data-workout="Advanced" class="workout-card rounded-2xl p-6 sm:p-7 text-left relative">
+          <div class="absolute top-3 right-3 w-6 h-6 rounded-full bg-primary flex items-center justify-center check-mark">
+            <svg class="w-4 h-4 text-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+          </div>
+          <div class="text-4xl mb-4">⚡</div>
+          <h2 class="text-xl sm:text-2xl font-black text-textLight">Advanced</h2>
+          <p class="text-textMuted mt-2 text-sm">For experienced and active users.</p>
+          <ul class="mt-4 space-y-1.5 text-sm text-textMuted">
+            <li>✓ 45–60 minute workouts</li>
+            <li>✓ Advanced exercises</li>
+            <li>✓ 5 days per week</li>
+          </ul>
+        </button>
+
+      </div>
+
+      <!-- Error -->
+      <p id="workout-error" class="hidden text-red-400 text-center text-sm mt-6">Please select a workout plan.</p>
+
+      <!-- Continue -->
+      <div class="text-center mt-8">
+        <button id="continue-btn" class="px-8 sm:px-10 py-3.5 sm:py-4 bg-primary text-dark font-bold rounded-2xl shadow-xl shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5 transition-all duration-300 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-primary/50">
+          CONTINUE →
+        </button>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    // Workout selection logic
+    document.addEventListener('DOMContentLoaded', function() {
+      const workoutCards = document.querySelectorAll('.workout-card');
+      const continueBtn = document.getElementById('continue-btn');
+      const errorEl = document.getElementById('workout-error');
+      let selectedWorkout = null;
+
+      workoutCards.forEach(card => {
+        card.addEventListener('click', function() {
+          workoutCards.forEach(c => c.classList.remove('selected'));
+          this.classList.add('selected');
+          selectedWorkout = this.dataset.workout;
+          errorEl.classList.add('hidden');
+        });
+      });
+
+      continueBtn.addEventListener('click', function() {
+        if (!selectedWorkout) {
+          errorEl.classList.remove('hidden');
+          return;
+        }
+        localStorage.setItem('workoutPlan', selectedWorkout);
+        window.location.href = 'dashboard.html';
+      });
+    });
+  </script>
+
+</body>
+</html>

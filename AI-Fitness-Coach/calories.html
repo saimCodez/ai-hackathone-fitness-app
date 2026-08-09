@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calories Calculator | AI Fitness Coach</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            dark: '#0a0e14',
+            surface: '#11181f',
+            card: '#1a2330',
+            borderDim: '#2a3645',
+            primary: '#f97316',
+            primarySoft: '#fb923c',
+            primaryLight: '#fdba74',
+            textLight: '#f1f5f9',
+            textMuted: '#94a3b8',
+          },
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+        }
+      }
+    }
+  </script>
+  <style>
+    * { scroll-behavior: smooth; }
+    body { background: #0a0e14; }
+
+    .logo-ring {
+      animation: spin 12s linear infinite;
+    }
+    .logo-ring-reverse {
+      animation: spin 8s linear infinite reverse;
+    }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .float-logo {
+      animation: float 6s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .bg-decoration {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .navbar-glass {
+      background: rgba(17, 24, 31, 0.7);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(42, 54, 69, 0.3);
+    }
+
+    .glass-card {
+      background: rgba(26, 35, 48, 0.5);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(42, 54, 69, 0.3);
+      transition: all 0.3s ease;
+    }
+    .glass-card:hover {
+      border-color: rgba(249, 115, 22, 0.3);
+      transform: translateY(-2px);
+      box-shadow: 0 20px 40px -12px rgba(249, 115, 22, 0.1);
+    }
+
+    .glow-pulse {
+      animation: glowPulse 3s ease-in-out infinite;
+    }
+    @keyframes glowPulse {
+      0%, 100% { box-shadow: 0 0 20px rgba(249, 115, 22, 0.05); }
+      50% { box-shadow: 0 0 40px rgba(249, 115, 22, 0.15); }
+    }
+
+    .btn-primary {
+      transition: all 0.3s ease;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 20px 40px -12px rgba(249, 115, 22, 0.3);
+    }
+
+    select:focus {
+      outline: none !important;
+    }
+    select:focus-visible {
+      outline: none !important;
+    }
+    *:focus {
+      outline: none !important;
+    }
+    *:focus-visible {
+      outline: none !important;
+    }
+    button:focus {
+      outline: none !important;
+    }
+
+    ::-webkit-scrollbar { width: 6px; background: #11181f; }
+    ::-webkit-scrollbar-thumb { background: #f97316; border-radius: 40px; }
+
+    .result-number {
+      animation: countUp 0.8s ease-out;
+    }
+    @keyframes countUp {
+      0% { opacity: 0; transform: scale(0.8); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    .link-underline {
+      position: relative;
+      display: inline-block;
+    }
+    .link-underline::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 0%;
+      height: 2px;
+      background: #f97316;
+      transition: width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    .link-underline:hover::after {
+      width: 100%;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-dark text-textLight antialiased">
+
+  <!-- Background decorations -->
+  <div class="bg-decoration w-96 h-96 bg-primary/5 top-20 -left-20"></div>
+  <div class="bg-decoration w-96 h-96 bg-primary/5 bottom-20 -right-20"></div>
+  <div class="bg-decoration w-64 h-64 bg-primary/3 top-1/2 left-1/2 -translate-x-1/2"></div>
+
+  <!-- ===== NAVBAR ===== -->
+  <header class="navbar-glass sticky top-0 z-50">
+    <nav class="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-3 group relative">
+        <div class="relative h-11 w-11 flex items-center justify-center float-logo">
+          <div class="absolute inset-0 rounded-full border-2 border-primary/30 logo-ring"></div>
+          <div class="absolute inset-0 rounded-full border-2 border-transparent border-t-primary/60 logo-ring-reverse"></div>
+          <div class="h-9 w-9 rounded-xl bg-primary flex items-center justify-center text-dark font-black text-sm shadow-lg shadow-primary/30 group-hover:shadow-primary/50 transition-all relative z-10">AF</div>
+        </div>
+        <div class="hidden sm:block leading-tight">
+          <div class="text-sm font-black tracking-tight">AI FITNESS</div>
+          <div class="text-[10px] font-bold uppercase tracking-[0.18em] text-textMuted">premium coach</div>
+        </div>
+      </a>
+      <div class="text-sm font-medium text-textMuted bg-card/50 px-4 py-2 rounded-full border border-borderDim/30">
+        Step 5 of 5
+      </div>
+    </nav>
+  </header>
+
+  <!-- ===== MAIN ===== -->
+  <main class="min-h-[calc(100vh-80px)] flex items-center justify-center px-4 py-8 sm:py-12">
+    <div class="w-full max-w-2xl relative z-10">
+
+      <!-- Heading -->
+      <div class="text-center mb-10">
+        <span class="text-xs font-bold text-primary tracking-[0.25em] uppercase">× calorie target</span>
+        <h1 class="text-4xl sm:text-5xl font-black mt-3 text-textLight">
+          Your Daily Calories
+        </h1>
+        <p class="text-textMuted mt-3 text-sm sm:text-base">
+          Select your activity level to calculate your daily calorie target.
+        </p>
+      </div>
+
+      <!-- Card -->
+      <div class="glass-card rounded-3xl p-6 sm:p-8 shadow-2xl glow-pulse">
+
+        <!-- Activity Level -->
+        <label class="block text-sm font-semibold text-textLight mb-3">
+          Activity Level
+        </label>
+
+        <select id="activity-level" class="w-full px-4 py-3 rounded-2xl bg-card/60 border border-borderDim/50 text-textLight focus:border-primary transition-all duration-300 cursor-pointer appearance-none" style="background-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2394a3b8' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E&quot;); background-repeat: no-repeat; background-position: right 16px center; padding-right: 40px;">
+          <option value="">Select activity level</option>
+          <option value="1.2">Sedentary — Little or no exercise</option>
+          <option value="1.375">Lightly Active — Exercise 1–3 days/week</option>
+          <option value="1.55">Moderately Active — Exercise 3–5 days/week</option>
+          <option value="1.725">Very Active — Exercise 6–7 days/week</option>
+        </select>
+
+        <!-- Calculate -->
+        <button id="calculate-btn" class="w-full mt-6 py-3.5 bg-primary text-dark font-bold rounded-2xl shadow-xl shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5 transition-all duration-300 text-base btn-primary">
+          CALCULATE CALORIES
+        </button>
+
+        <!-- Error -->
+        <p id="calorie-error" class="hidden text-red-400 text-sm text-center mt-4">Please select your activity level.</p>
+
+        <!-- Result -->
+        <div id="calorie-result-box" class="hidden mt-8 text-center glass-card rounded-2xl p-8 border border-primary/20">
+          <p class="text-sm text-textMuted uppercase tracking-wider">Your Daily Target</p>
+          <div id="calorie-result" class="text-6xl font-black text-primary mt-3 result-number">--</div>
+          <p class="text-textMuted mt-2">calories per day</p>
+          <div id="calorie-goal-message" class="mt-5 text-sm text-textMuted"></div>
+        </div>
+
+        <!-- Continue -->
+        <button id="continue-btn" class="hidden w-full mt-6 py-3.5 bg-primary text-dark font-bold rounded-2xl shadow-xl shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5 transition-all duration-300 text-base btn-primary">
+          Continue to Workout →
+        </button>
+
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="relative z-10 border-t border-borderDim/30 mt-8 px-4 py-6">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div class="flex items-center gap-3"><div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-dark font-black text-sm">AF</div><div><div class="font-bold text-sm">AI FITNESS COACH</div><div class="text-[10px] text-textMuted">Premium Training</div></div></div>
+      <div class="text-sm text-textMuted">© 2026 AI Fitness Coach. All rights reserved.</div>
+    </div>
+  </footer>
+
+  <script>
+    // Calories Calculator Logic
+    document.addEventListener('DOMContentLoaded', function() {
+      const activitySelect = document.getElementById('activity-level');
+      const calculateBtn = document.getElementById('calculate-btn');
+      const continueBtn = document.getElementById('continue-btn');
+      const errorEl = document.getElementById('calorie-error');
+      const resultBox = document.getElementById('calorie-result-box');
+      const resultDisplay = document.getElementById('calorie-result');
+      const goalMessage = document.getElementById('calorie-goal-message');
+
+      // Get user profile from localStorage
+      function getUserProfile() {
+        const possibleKeys = [
+          'aiFitnessCoach.profile',
+          'aiFitnessCoach.userProfile',
+          'profile',
+          'fitnessProfile'
+        ];
+
+        for (const key of possibleKeys) {
+          try {
+            const data = JSON.parse(localStorage.getItem(key));
+            if (data && data.age && data.height && data.weight) {
+              return data;
+            }
+          } catch (e) {}
+        }
+
+        // Try to get from individual keys
+        try {
+          const age = localStorage.getItem('userAge') || localStorage.getItem('age');
+          const height = localStorage.getItem('userHeight') || localStorage.getItem('height');
+          const weight = localStorage.getItem('userWeight') || localStorage.getItem('weight');
+          const gender = localStorage.getItem('userGender') || localStorage.getItem('gender');
+
+          if (age && height && weight) {
+            return {
+              age: parseInt(age),
+              height: parseInt(height),
+              weight: parseInt(weight),
+              gender: gender || 'male'
+            };
+          }
+        } catch (e) {}
+
+        return null;
+      }
+
+      function calculateCalories(activityLevel) {
+        const profile = getUserProfile();
+
+        if (!profile || !profile.age || !profile.height || !profile.weight) {
+          return null;
+        }
+
+        const age = Number(profile.age);
+        const height = Number(profile.height);
+        const weight = Number(profile.weight);
+        const gender = profile.gender || 'male';
+
+        let bmr;
+        if (gender === 'male' || gender === 'Male') {
+          bmr = 10 * weight + 6.25 * height - 5 * age + 5;
+        } else {
+          bmr = 10 * weight + 6.25 * height - 5 * age - 161;
+        }
+
+        return Math.round(bmr * activityLevel);
+      }
+
+      function getGoalMessage(calories) {
+        const profile = getUserProfile();
+        if (!profile) return '';
+
+        const weight = Number(profile.weight);
+        const goal = localStorage.getItem('fitnessGoal') || '';
+
+        if (goal === 'lose' || goal === 'Lose Weight') {
+          const deficit = Math.round(calories * 0.2);
+          return `For weight loss, aim for ${calories - deficit} calories per day (${deficit} calorie deficit)`;
+        } else if (goal === 'strength' || goal === 'Build Strength') {
+          const surplus = Math.round(calories * 0.1);
+          return `For muscle gain, aim for ${calories + surplus} calories per day (${surplus} calorie surplus)`;
+        } else {
+          return `Maintain your current weight with ${calories} calories per day`;
+        }
+      }
+
+      calculateBtn.addEventListener('click', function() {
+        const value = activitySelect.value;
+
+        if (!value) {
+          errorEl.classList.remove('hidden');
+          resultBox.classList.add('hidden');
+          continueBtn.classList.add('hidden');
+          return;
+        }
+
+        errorEl.classList.add('hidden');
+
+        const activityLevel = parseFloat(value);
+        const calories = calculateCalories(activityLevel);
+
+        if (calories === null) {
+          errorEl.textContent = 'Please complete your profile first (age, height, weight)';
+          errorEl.classList.remove('hidden');
+          resultBox.classList.add('hidden');
+          continueBtn.classList.add('hidden');
+          return;
+        }
+
+        // Show result with animation
+        resultBox.classList.remove('hidden');
+        resultDisplay.textContent = calories.toLocaleString();
+        goalMessage.textContent = getGoalMessage(calories);
+
+        // Show continue button
+        continueBtn.classList.remove('hidden');
+
+        // Save to localStorage
+        localStorage.setItem('dailyCalories', calories);
+        localStorage.setItem('activityLevel', activityLevel);
+      });
+
+      // Continue button
+      continueBtn.addEventListener('click', function() {
+        window.location.href = 'workout.html';
+      });
+
+      // Auto-calculate if activity level was previously saved
+      const savedActivity = localStorage.getItem('activityLevel');
+      if (savedActivity) {
+        // Find matching option
+        const options = activitySelect.options;
+        for (let i = 0; i < options.length; i++) {
+          if (options[i].value === savedActivity) {
+            activitySelect.value = savedActivity;
+            calculateBtn.click();
+            break;
+          }
+        }
+      }
+    });
+  </script>
+
+</body>
+</html>

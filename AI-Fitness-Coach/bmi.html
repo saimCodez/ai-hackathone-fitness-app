@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BMI Calculator - AI Fitness Coach</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            dark: '#0a0e14',
+            surface: '#11181f',
+            card: '#1a2330',
+            borderDim: '#2a3645',
+            primary: '#f97316',
+            primarySoft: '#fb923c',
+            primaryLight: '#fdba74',
+            textLight: '#f1f5f9',
+            textMuted: '#94a3b8',
+          },
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+        }
+      }
+    }
+  </script>
+  <style>
+    * { scroll-behavior: smooth; }
+    body { background: #0a0e14; }
+
+    .logo-ring {
+      animation: spin 12s linear infinite;
+    }
+    .logo-ring-reverse {
+      animation: spin 8s linear infinite reverse;
+    }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .float-logo {
+      animation: float 6s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .bg-decoration {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .navbar-glass {
+      background: rgba(17, 24, 31, 0.7);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(42, 54, 69, 0.3);
+    }
+
+    .glass-card {
+      background: rgba(26, 35, 48, 0.5);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(42, 54, 69, 0.3);
+      transition: all 0.3s ease;
+    }
+    .glass-card:hover {
+      border-color: rgba(249, 115, 22, 0.3);
+      transform: translateY(-2px);
+      box-shadow: 0 20px 40px -12px rgba(249, 115, 22, 0.1);
+    }
+
+    .glow-pulse {
+      animation: glowPulse 3s ease-in-out infinite;
+    }
+    @keyframes glowPulse {
+      0%, 100% { box-shadow: 0 0 20px rgba(249, 115, 22, 0.05); }
+      50% { box-shadow: 0 0 40px rgba(249, 115, 22, 0.15); }
+    }
+
+    .btn-primary {
+      transition: all 0.3s ease;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 20px 40px -12px rgba(249, 115, 22, 0.3);
+    }
+
+    *:focus {
+      outline: none !important;
+    }
+    *:focus-visible {
+      outline: none !important;
+    }
+    button:focus {
+      outline: none !important;
+    }
+
+    ::-webkit-scrollbar { width: 6px; background: #11181f; }
+    ::-webkit-scrollbar-thumb { background: #f97316; border-radius: 40px; }
+
+    .result-number {
+      animation: countUp 0.8s ease-out;
+    }
+    @keyframes countUp {
+      0% { opacity: 0; transform: scale(0.8); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    .bmi-badge {
+      display: inline-block;
+      padding: 0.25rem 1rem;
+      border-radius: 9999px;
+      font-weight: 700;
+      font-size: 0.875rem;
+      margin-top: 0.5rem;
+    }
+    .bmi-underweight { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
+    .bmi-normal { background: rgba(52, 211, 153, 0.2); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.3); }
+    .bmi-overweight { background: rgba(251, 191, 36, 0.2); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.3); }
+    .bmi-obese { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+
+    .link-underline {
+      position: relative;
+      display: inline-block;
+    }
+    .link-underline::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 0%;
+      height: 2px;
+      background: #f97316;
+      transition: width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    .link-underline:hover::after {
+      width: 100%;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-dark text-textLight antialiased">
+
+  <!-- Background decorations -->
+  <div class="bg-decoration w-96 h-96 bg-primary/5 top-20 -left-20"></div>
+  <div class="bg-decoration w-96 h-96 bg-primary/5 bottom-20 -right-20"></div>
+  <div class="bg-decoration w-64 h-64 bg-primary/3 top-1/2 left-1/2 -translate-x-1/2"></div>
+
+  <!-- ===== NAVBAR ===== -->
+  <header class="navbar-glass sticky top-0 z-50">
+    <nav class="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-3 group relative">
+        <div class="relative h-11 w-11 flex items-center justify-center float-logo">
+          <div class="absolute inset-0 rounded-full border-2 border-primary/30 logo-ring"></div>
+          <div class="absolute inset-0 rounded-full border-2 border-transparent border-t-primary/60 logo-ring-reverse"></div>
+          <div class="h-9 w-9 rounded-xl bg-primary flex items-center justify-center text-dark font-black text-sm shadow-lg shadow-primary/30 group-hover:shadow-primary/50 transition-all relative z-10">AF</div>
+        </div>
+        <div class="hidden sm:block leading-tight">
+          <div class="text-sm font-black tracking-tight">AI FITNESS</div>
+          <div class="text-[10px] font-bold uppercase tracking-[0.18em] text-textMuted">premium coach</div>
+        </div>
+      </a>
+      <div class="text-sm font-medium text-textMuted bg-card/50 px-4 py-2 rounded-full border border-borderDim/30">
+        Step 4 of 5
+      </div>
+    </nav>
+  </header>
+
+  <!-- ===== MAIN ===== -->
+  <main class="min-h-[calc(100vh-80px)] flex items-center justify-center px-4 py-8 sm:py-12">
+    <div class="w-full max-w-xl relative z-10">
+
+      <!-- Heading -->
+      <div class="text-center mb-10">
+        <span class="text-xs font-bold text-primary tracking-[0.25em] uppercase">× bmi calculator</span>
+        <h1 class="text-4xl sm:text-5xl font-black mt-3 text-textLight">
+          Calculate Your BMI
+        </h1>
+        <p class="text-textMuted mt-3 text-sm sm:text-base">
+          We'll calculate your BMI using your profile information.
+        </p>
+      </div>
+
+      <!-- BMI Card -->
+      <div class="glass-card rounded-3xl p-6 sm:p-8 shadow-2xl glow-pulse">
+
+        <!-- Profile Information -->
+        <div class="grid grid-cols-2 gap-4 mb-6">
+          <div class="rounded-2xl bg-card/60 border border-borderDim/30 p-4 text-center">
+            <p class="text-textMuted text-sm">Height</p>
+            <p id="height-display" class="text-2xl font-bold text-textLight mt-1">--</p>
+          </div>
+          <div class="rounded-2xl bg-card/60 border border-borderDim/30 p-4 text-center">
+            <p class="text-textMuted text-sm">Weight</p>
+            <p id="weight-display" class="text-2xl font-bold text-textLight mt-1">--</p>
+          </div>
+        </div>
+
+        <!-- BMI Result -->
+        <div class="text-center rounded-2xl bg-card/60 border border-borderDim/30 p-8">
+          <p class="text-textMuted text-sm uppercase tracking-wider">Your BMI</p>
+          <div id="bmi-result" class="text-6xl font-black text-primary mt-3 result-number">--</div>
+          <div id="bmi-status" class="mt-3"></div>
+          <p id="bmi-message" class="text-textMuted text-sm mt-2"></p>
+        </div>
+
+        <!-- Error -->
+        <p id="bmi-error" class="hidden text-red-400 text-sm mt-5 text-center"></p>
+
+        <!-- Continue -->
+        <button id="continue-btn" class="w-full mt-6 py-3.5 bg-primary text-dark font-bold rounded-2xl shadow-xl shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5 transition-all duration-300 text-base btn-primary">
+          Continue →
+        </button>
+
+        <!-- Progress Dots -->
+        <div class="flex justify-center gap-2 mt-6">
+          <div class="w-8 h-1.5 rounded-full bg-primary"></div>
+          <div class="w-8 h-1.5 rounded-full bg-primary"></div>
+          <div class="w-8 h-1.5 rounded-full bg-primary"></div>
+          <div class="w-8 h-1.5 rounded-full bg-primary"></div>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="relative z-10 border-t border-borderDim/30 mt-8 px-4 py-6">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div class="flex items-center gap-3"><div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-dark font-black text-sm">AF</div><div><div class="font-bold text-sm">AI FITNESS COACH</div><div class="text-[10px] text-textMuted">Premium Training</div></div></div>
+      <div class="text-sm text-textMuted">© 2026 AI Fitness Coach. All rights reserved.</div>
+    </div>
+  </footer>
+
+  <script>
+    // BMI Calculator Logic
+    document.addEventListener('DOMContentLoaded', function() {
+      const heightDisplay = document.getElementById('height-display');
+      const weightDisplay = document.getElementById('weight-display');
+      const bmiResult = document.getElementById('bmi-result');
+      const bmiStatus = document.getElementById('bmi-status');
+      const bmiMessage = document.getElementById('bmi-message');
+      const bmiError = document.getElementById('bmi-error');
+      const continueBtn = document.getElementById('continue-btn');
+
+      // Get user profile from localStorage
+      function getUserProfile() {
+        const possibleKeys = [
+          'aiFitnessCoach.profile',
+          'aiFitnessCoach.userProfile',
+          'profile',
+          'fitnessProfile'
+        ];
+
+        for (const key of possibleKeys) {
+          try {
+            const data = JSON.parse(localStorage.getItem(key));
+            if (data && data.height && data.weight) {
+              return data;
+            }
+          } catch (e) {}
+        }
+
+        // Try to get from individual keys
+        try {
+          const height = localStorage.getItem('userHeight') || localStorage.getItem('height');
+          const weight = localStorage.getItem('userWeight') || localStorage.getItem('weight');
+          const age = localStorage.getItem('userAge') || localStorage.getItem('age');
+          const gender = localStorage.getItem('userGender') || localStorage.getItem('gender');
+
+          if (height && weight) {
+            return {
+              height: parseInt(height),
+              weight: parseInt(weight),
+              age: age ? parseInt(age) : null,
+              gender: gender || 'male'
+            };
+          }
+        } catch (e) {}
+
+        return null;
+      }
+
+      function calculateBMI(height, weight) {
+        const heightMeters = height / 100;
+        return weight / (heightMeters * heightMeters);
+      }
+
+      function getBMICategory(bmi) {
+        if (bmi < 18.5) {
+          return { status: 'Underweight', class: 'bmi-underweight', message: 'You may need to gain some weight for optimal health.' };
+        } else if (bmi >= 18.5 && bmi < 25) {
+          return { status: 'Normal weight', class: 'bmi-normal', message: 'Great job! You\'re in a healthy weight range.' };
+        } else if (bmi >= 25 && bmi < 30) {
+          return { status: 'Overweight', class: 'bmi-overweight', message: 'Consider incorporating more physical activity into your routine.' };
+        } else {
+          return { status: 'Obese', class: 'bmi-obese', message: 'Focus on healthy eating and regular exercise for better health.' };
+        }
+      }
+
+      function updateBMI() {
+        const profile = getUserProfile();
+
+        if (!profile || !profile.height || !profile.weight) {
+          heightDisplay.textContent = '--';
+          weightDisplay.textContent = '--';
+          bmiResult.textContent = '--';
+          bmiStatus.innerHTML = '';
+          bmiMessage.textContent = 'Please complete your profile first.';
+          bmiError.textContent = 'Missing profile information. Please complete your profile.';
+          bmiError.classList.remove('hidden');
+          continueBtn.disabled = true;
+          continueBtn.classList.add('opacity-50', 'cursor-not-allowed');
+          return;
+        }
+
+        const height = Number(profile.height);
+        const weight = Number(profile.weight);
+
+        if (height <= 0 || weight <= 0) {
+          heightDisplay.textContent = height || '--';
+          weightDisplay.textContent = weight || '--';
+          bmiResult.textContent = '--';
+          bmiStatus.innerHTML = '';
+          bmiMessage.textContent = 'Invalid height or weight values.';
+          bmiError.textContent = 'Invalid height or weight values.';
+          bmiError.classList.remove('hidden');
+          continueBtn.disabled = true;
+          continueBtn.classList.add('opacity-50', 'cursor-not-allowed');
+          return;
+        }
+
+        heightDisplay.textContent = `${height} cm`;
+        weightDisplay.textContent = `${weight} kg`;
+
+        const bmi = calculateBMI(height, weight);
+        const roundedBMI = Math.round(bmi * 10) / 10;
+        bmiResult.textContent = roundedBMI;
+
+        const category = getBMICategory(bmi);
+        bmiStatus.innerHTML = `<span class="bmi-badge ${category.class}">${category.status}</span>`;
+        bmiMessage.textContent = category.message;
+
+        bmiError.classList.add('hidden');
+        continueBtn.disabled = false;
+        continueBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+
+        // Save BMI to localStorage
+        localStorage.setItem('bmi', roundedBMI);
+        localStorage.setItem('bmiCategory', category.status);
+      }
+
+      // Continue button
+      continueBtn.addEventListener('click', function() {
+        if (!this.disabled) {
+          window.location.href = 'calories.html';
+        }
+      });
+
+      // Initial update
+      updateBMI();
+
+      // Listen for storage changes (if profile updates in another tab)
+      window.addEventListener('storage', function(e) {
+        if (e.key && (e.key.includes('profile') || e.key.includes('height') || e.key.includes('weight'))) {
+          updateBMI();
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>

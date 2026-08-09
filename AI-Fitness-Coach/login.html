@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title>AI Fitness Coach - Login</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  rel="stylesheet"
+  type="text/css"
+  href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"
+/>
+
+<script
+  type="text/javascript"
+  src="https://cdn.jsdelivr.net/npm/toastify-js">
+</script>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&display=swap"
+    rel="stylesheet"
+  />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            dark: '#0a0e14',
+            surface: '#11181f',
+            card: '#1a2330',
+            borderDim: '#2a3645',
+            primary: '#f97316',
+            primarySoft: '#fb923c',
+            primaryLight: '#fdba74',
+            textLight: '#f1f5f9',
+            textMuted: '#94a3b8',
+          },
+
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    * {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: #0a0e14;
+    }
+
+    .glass-card {
+      background: rgba(26, 35, 48, 0.7);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(42, 54, 69, 0.3);
+      transition:
+        border-color 0.25s,
+        box-shadow 0.3s,
+        transform 0.3s;
+    }
+
+    .glass-card:hover {
+      border-color: rgba(249, 115, 22, 0.4);
+
+      box-shadow:
+        0 20px 40px -16px rgba(0, 0, 0, 0.9),
+        0 0 0 1px rgba(249, 115, 22, 0.1);
+
+      transform: translateY(-4px);
+    }
+
+    .hover-lift {
+      transition:
+        transform 0.25s ease,
+        box-shadow 0.3s ease;
+    }
+
+    .hover-lift:hover {
+      transform: translateY(-6px);
+
+      box-shadow:
+        0 20px 40px -12px rgba(249, 115, 22, 0.25);
+    }
+
+    .glow-orange {
+      animation: glowPulse 3s ease-in-out infinite;
+    }
+
+    @keyframes glowPulse {
+      0%,
+      100% {
+        box-shadow: 0 0 20px rgba(249, 115, 22, 0.15);
+      }
+
+      50% {
+        box-shadow: 0 0 40px rgba(249, 115, 22, 0.35);
+      }
+    }
+
+    .link-underline {
+      position: relative;
+      display: inline-block;
+    }
+
+    .link-underline::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 0%;
+      height: 2px;
+      background: #f97316;
+      transition:
+        width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    .link-underline:hover::after {
+      width: 100%;
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+      background: #11181f;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #f97316;
+      border-radius: 40px;
+    }
+
+    .logo-ring {
+      animation: spin 12s linear infinite;
+    }
+
+    .logo-ring-reverse {
+      animation: spin 8s linear infinite reverse;
+    }
+
+    @keyframes spin {
+      from {
+        transform: rotate(0deg);
+      }
+
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    input:focus {
+      outline: none !important;
+    }
+
+    input:focus-visible {
+      outline: none !important;
+    }
+
+    .input-group input {
+      transition:
+        border-color 0.3s ease,
+        box-shadow 0.3s ease;
+    }
+
+    .input-group input:focus {
+      border-color: #f97316 !important;
+
+      box-shadow:
+        0 0 0 3px rgba(249, 115, 22, 0.25),
+        0 0 0 1px #f97316 !important;
+    }
+
+    *:focus {
+      outline: none !important;
+    }
+
+    *:focus-visible {
+      outline: none !important;
+    }
+
+    button:focus {
+      outline: none !important;
+    }
+
+    .float-logo {
+      animation: float 6s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%,
+      100% {
+        transform: translateY(0px);
+      }
+
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+
+    .bg-decoration {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+    }
+  </style>
+</head>
+
+<body
+  class="min-h-screen bg-dark text-textLight antialiased flex items-center justify-center p-4 relative overflow-hidden"
+>
+
+  <!-- Background decorations -->
+
+  <div
+    class="bg-decoration w-96 h-96 bg-primary/5 top-20 -left-20"
+  ></div>
+
+  <div
+    class="bg-decoration w-96 h-96 bg-primary/5 bottom-20 -right-20"
+  ></div>
+
+
+  <!-- LOGIN -->
+
+  <main class="mx-auto w-full max-w-md relative z-10">
+
+    <div
+      class="glass-card rounded-[32px] p-8 sm:p-10 shadow-2xl border border-borderDim/30 hover-lift glow-orange"
+    >
+
+      <!-- Logo & Header -->
+
+      <div class="mb-8 text-center">
+
+        <div class="flex justify-center mb-4">
+
+          <div
+            class="relative h-24 w-24 flex items-center justify-center float-logo flex-shrink-0"
+          >
+
+            <div
+              class="absolute inset-0 rounded-full border-2 border-primary/30 logo-ring"
+            ></div>
+
+            <div
+              class="absolute inset-0 rounded-full border-2 border-transparent border-t-primary/60 logo-ring-reverse"
+            ></div>
+
+            <div
+              class="h-16 w-16 rounded-2xl bg-primary flex items-center justify-center text-dark font-extrabold text-3xl shadow-lg shadow-primary/30 relative z-10"
+            >
+              AF
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div>
+
+          <div
+            class="text-[10px] font-bold uppercase tracking-[0.3em] text-primary"
+          >
+            AI Fitness Coach
+          </div>
+
+          <div
+            class="text-2xl sm:text-3xl font-extrabold text-textLight mt-1"
+          >
+            Welcome back
+          </div>
+
+        </div>
+
+        <p class="mt-3 text-sm text-textMuted">
+          Log in to continue your fitness journey and track your progress.
+        </p>
+
+      </div>
+
+
+      <!-- Back to Home -->
+
+      <div class="mb-6 text-center">
+
+        <a
+          href="index.html"
+          class="text-sm text-textMuted hover:text-primary transition-colors"
+        >
+          ← Back to Home
+        </a>
+
+      </div>
+
+
+      <!-- Form -->
+
+      <form
+        id="login-form"
+        class="space-y-5"
+        novalidate
+      >
+
+        <div class="input-group">
+
+          <label
+            for="login-email"
+            class="text-sm font-medium text-textLight"
+          >
+            Email
+          </label>
+
+          <input
+            id="login-email"
+            name="email"
+            type="email"
+            required
+            class="mt-2 block w-full min-w-0 rounded-2xl border border-borderDim/50 bg-card/30 px-4 py-3 text-textLight placeholder:text-textMuted/50 transition-all duration-300"
+            aria-describedby="login-email-error"
+            placeholder="you@example.com"
+          />
+
+          <p
+            id="login-email-error"
+            class="text-xs text-red-500 mt-1 hidden"
+            role="alert"
+          ></p>
+
+        </div>
+
+
+        <div class="input-group">
+
+          <label
+            for="login-password"
+            class="text-sm font-medium text-textLight"
+          >
+            Password
+          </label>
+
+          <input
+            id="login-password"
+            name="password"
+            type="password"
+            required
+            class="mt-2 block w-full min-w-0 rounded-2xl border border-borderDim/50 bg-card/30 px-4 py-3 text-textLight placeholder:text-textMuted/50 transition-all duration-300"
+            aria-describedby="login-password-error"
+            placeholder="••••••••"
+          />
+
+          <p
+            id="login-password-error"
+            class="text-xs text-red-500 mt-1 hidden"
+            role="alert"
+          ></p>
+
+        </div>
+
+
+        <div class="flex items-center justify-between text-sm">
+
+          <a
+            href="#"
+            class="link-underline text-textMuted hover:text-primary transition-colors"
+          >
+            Forgot password?
+          </a>
+
+          <span class="text-textMuted/60">
+            Need help?
+          </span>
+
+        </div>
+
+
+        <button
+          type="submit"
+          class="mt-2 w-full inline-flex justify-center px-5 py-3.5 bg-primary text-dark font-bold rounded-2xl shadow-xl shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5 transition-all duration-300 text-base focus:outline-none focus:ring-2 focus:ring-primary/50"
+        >
+          Log in
+        </button>
+
+      </form>
+
+
+      <!-- Signup -->
+
+      <p class="mt-6 text-center text-sm text-textMuted">
+
+        New here?
+
+        <a
+          href="signup.html"
+          class="text-primary font-bold link-underline hover:text-primaryLight transition-colors"
+        >
+          Create an account
+        </a>
+
+      </p>
+
+    </div>
+
+  </main>
+
+
+  <!-- Auth JavaScript -->
+
+  <script
+    type="module"
+    src="js/auth.js"
+  ></script>
+
+</body>
+</html>

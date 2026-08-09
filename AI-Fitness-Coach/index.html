@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Fitness Coach — orange · modern</title>
+  <!-- Inter + Tailwind (no React) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            dark: '#0a0e14',
+            surface: '#11181f',
+            card: '#1a2330',
+            borderDim: '#2a3645',
+            primary: '#f97316',
+            primarySoft: '#fb923c',
+            primaryLight: '#fdba74',
+            accent: '#f97316',
+            textLight: '#f1f5f9',
+            textMuted: '#94a3b8',
+          },
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+          animation: {
+            'float': 'float 8s ease-in-out infinite',
+            'pulse-slow': 'pulse 8s ease-in-out infinite',
+            'underline': 'underline 0.6s ease-out forwards',
+          },
+          keyframes: {
+            float: { '0%,100%': { transform: 'translateY(0px)' }, '50%': { transform: 'translateY(-12px)' } },
+            underline: { '0%': { width: '0%' }, '100%': { width: '100%' } },
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    * { scroll-behavior: smooth; }
+    body { background: #0a0e14; }
+    /* glass with orange tint */
+    .glass {
+      background: rgba(17, 24, 31, 0.7);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(42, 54, 69, 0.4);
+    }
+    .glass-card {
+      background: rgba(26, 35, 48, 0.7);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(42, 54, 69, 0.3);
+      transition: border-color 0.25s, box-shadow 0.3s, transform 0.3s;
+    }
+    .glass-card:hover {
+      border-color: rgba(249, 115, 22, 0.4);
+      box-shadow: 0 20px 40px -16px rgba(0,0,0,0.9), 0 0 0 1px rgba(249,115,22,0.1);
+      transform: translateY(-4px);
+    }
+    .gradient-text {
+      background: linear-gradient(145deg, #f97316, #fb923c, #fdba74);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .border-glow {
+      border-color: rgba(249, 115, 22, 0.2);
+    }
+    /* underline animation */
+    .link-underline {
+      position: relative;
+      display: inline-block;
+    }
+    .link-underline::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 0%;
+      height: 2px;
+      background: #f97316;
+      transition: width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    .link-underline:hover::after {
+      width: 100%;
+    }
+    .link-underline-white::after {
+      background: #f1f5f9;
+    }
+    /* interactive hover lift */
+    .hover-lift {
+      transition: transform 0.25s ease, box-shadow 0.3s ease;
+    }
+    .hover-lift:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 40px -12px rgba(249,115,22,0.25);
+    }
+    /* orange glow */
+    .glow-orange {
+      box-shadow: 0 0 40px -12px rgba(249,115,22,0.3);
+    }
+    .glow-orange:hover {
+      box-shadow: 0 0 60px -8px rgba(249,115,22,0.5);
+    }
+    ::-webkit-scrollbar { width: 6px; background: #11181f; }
+    ::-webkit-scrollbar-thumb { background: #f97316; border-radius: 40px; }
+    .img-overlay {
+      background: linear-gradient(135deg, rgba(10,14,20,0.8) 0%, rgba(10,14,20,0.2) 100%);
+    }
+    .img-overlay-light {
+      background: linear-gradient(135deg, rgba(10,14,20,0.6) 0%, rgba(10,14,20,0.1) 100%);
+    }
+    /* animated border pulse */
+    .border-pulse {
+      animation: borderPulse 3s ease-in-out infinite;
+    }
+    @keyframes borderPulse {
+      0%, 100% { border-color: rgba(249,115,22,0.2); }
+      50% { border-color: rgba(249,115,22,0.6); }
+    }
+  </style>
+</head>
+<body class="bg-dark text-textLight antialiased overflow-x-hidden">
+
+  <!-- ===== NAVBAR ===== -->
+  <header class="fixed top-0 left-0 right-0 z-50 pt-4 px-4">
+    <nav class="max-w-6xl mx-auto glass rounded-2xl px-5 py-3 flex items-center justify-between shadow-2xl shadow-black/40 border border-borderDim/30">
+      <a href="#home" class="flex items-center gap-3 group">
+        <div class="w-9 h-9 rounded-xl bg-primary text-dark flex items-center justify-center font-black text-base shadow-lg shadow-primary/30 group-hover:shadow-primary/50 transition-all">AF</div>
+        <div class="hidden sm:block leading-tight">
+          <div class="text-sm font-black tracking-tight">AI FITNESS</div>
+          <div class="text-[10px] font-bold uppercase tracking-[0.18em] text-textMuted">premium coach</div>
+        </div>
+      </a>
+
+      <ul class="hidden lg:flex items-center gap-7 text-sm font-medium">
+        <li><a href="#features" class="link-underline text-textMuted hover:text-primary transition-colors">Features</a></li>
+        <li><a href="#workouts" class="link-underline text-textMuted hover:text-primary transition-colors">Workouts</a></li>
+        <li><a href="#nutrition" class="link-underline text-textMuted hover:text-primary transition-colors">Nutrition</a></li>
+        <li><a href="#habits" class="link-underline text-textMuted hover:text-primary transition-colors">Habits</a></li>
+        <li><a href="#progress" class="link-underline text-textMuted hover:text-primary transition-colors">Progress</a></li>
+        <li><a href="#coach" class="link-underline text-textMuted hover:text-primary transition-colors">AI Coach</a></li>
+      </ul>
+
+      <div class="flex items-center gap-3">
+        <a href="login.html" class="link-underline text-sm text-textMuted hover:text-primary transition-colors hidden sm:inline font-medium">Log In</a>
+        <a href="signup.html" class="hidden sm:inline-flex items-center px-5 py-2.5 bg-primary text-dark font-bold text-sm rounded-xl shadow-xl shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5 transition-all duration-300">Get Started</a>
+        <!-- mobile -->
+        <div class="lg:hidden">
+          <details class="relative group">
+            <summary class="list-none p-2 rounded-xl border border-borderDim/40 text-textMuted hover:text-primary cursor-pointer transition-all">☰</summary>
+            <div class="absolute right-0 mt-2 w-56 glass rounded-2xl p-4 shadow-2xl border border-borderDim/30">
+              <a href="#features" class="block py-2 px-3 text-textMuted hover:text-primary hover:bg-white/5 rounded-lg transition-all">Features</a>
+              <a href="#workouts" class="block py-2 px-3 text-textMuted hover:text-primary hover:bg-white/5 rounded-lg transition-all">Workouts</a>
+              <a href="#nutrition" class="block py-2 px-3 text-textMuted hover:text-primary hover:bg-white/5 rounded-lg transition-all">Nutrition</a>
+              <a href="#habits" class="block py-2 px-3 text-textMuted hover:text-primary hover:bg-white/5 rounded-lg transition-all">Habits</a>
+              <a href="#progress" class="block py-2 px-3 text-textMuted hover:text-primary hover:bg-white/5 rounded-lg transition-all">Progress</a>
+              <a href="#coach" class="block py-2 px-3 text-textMuted hover:text-primary hover:bg-white/5 rounded-lg transition-all">AI Coach</a>
+              <hr class="border-borderDim/20 my-2" />
+              <a href="login.html" class="block py-2 px-3 text-textMuted hover:text-primary hover:bg-white/5 rounded-lg transition-all">Log In</a>
+              <a href="signup.html" class="block mt-2 px-4 py-2.5 bg-primary text-dark font-bold text-sm rounded-xl text-center shadow-xl">Get Started</a>
+            </div>
+          </details>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- ===== HERO ===== -->
+  <section id="home" class="min-h-screen flex items-center justify-center pt-28 pb-12 px-4 relative overflow-hidden">
+    <div class="absolute inset-0 -z-10">
+      <div class="absolute top-20 left-10 w-64 h-64 bg-primary/5 rounded-full blur-3xl animate-pulse-slow"></div>
+      <div class="absolute bottom-10 right-10 w-72 h-72 bg-primary/5 rounded-full blur-3xl animate-pulse-slow" style="animation-delay: 2s;"></div>
+    </div>
+    <div class="max-w-7xl mx-auto w-full">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <div class="space-y-6 order-2 lg:order-1">
+          <span class="text-xs font-bold text-primary tracking-[0.25em] uppercase animate-pulse">× ai coach</span>
+          <h1 class="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black leading-[1.05] tracking-tight">
+            TRAIN <br />
+            <span class="gradient-text">SMARTER.</span> <br />
+            GET <br />
+            <span class="text-textLight">STRONGER.</span>
+          </h1>
+          <p class="text-lg text-textMuted max-w-xl leading-relaxed font-light">
+            Premium AI coaching that adapts to your body, schedule, and goals. 
+            Build strength, track habits, and transform with real-time progress.
+          </p>
+          <div class="flex flex-wrap gap-4 pt-2">
+            <a href="signup.html" class="group inline-flex items-center justify-center px-8 py-4 bg-primary text-dark font-bold rounded-xl shadow-2xl shadow-primary/30 hover:shadow-primary/50 hover:-translate-y-0.5 transition-all duration-300">
+              START YOUR JOURNEY <span class="ml-2 group-hover:translate-x-1 transition-transform">→</span>
+            </a>
+            <a href="#features" class="inline-flex items-center justify-center px-8 py-4 border border-primary/30 text-primary font-bold rounded-xl hover:border-primary hover:bg-primary/5 transition-all duration-300">EXPLORE</a>
+          </div>
+          <div class="flex flex-wrap gap-8 pt-6 border-t border-borderDim/30">
+            <div><span class="text-2xl font-black text-primary">2.1M+</span><div class="text-xs text-textMuted">active users</div></div>
+            <div><span class="text-2xl font-black text-primary">4.9★</span><div class="text-xs text-textMuted">app store</div></div>
+            <div><span class="text-2xl font-black text-primary">89%</span><div class="text-xs text-textMuted">goal achieved</div></div>
+          </div>
+        </div>
+        <!-- right: image -->
+        <div class="relative h-[500px] lg:h-[600px] order-1 lg:order-2">
+          <div class="absolute inset-0 rounded-3xl overflow-hidden shadow-2xl shadow-primary/10 border border-borderDim/30 border-pulse">
+            <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&h=800&fit=crop&crop=center" alt="athlete training" class="w-full h-full object-cover" />
+            <div class="absolute inset-0 img-overlay"></div>
+          </div>
+          <!-- floating cards -->
+          <div class="absolute top-6 left-4 animate-float glass-card rounded-2xl p-4 max-w-xs border border-primary/20">
+            <div class="text-[10px] font-bold text-primary tracking-widest uppercase">Today's workout</div>
+            <div class="mt-1 flex items-end justify-between">
+              <div><span class="text-xl font-black">FULL BODY</span><div class="text-xs text-textMuted">42 min · intense</div></div>
+              <span class="text-3xl">💪</span>
+            </div>
+            <div class="mt-2 h-1 w-full bg-borderDim/50 rounded-full overflow-hidden"><div class="h-full w-3/4 bg-primary"></div></div>
+          </div>
+          <div class="absolute bottom-10 left-4 animate-float glass-card rounded-2xl p-4 max-w-xs border border-primary/20" style="animation-delay:0.4s">
+            <div class="text-[10px] font-bold text-primary tracking-widest uppercase">streak</div>
+            <div class="flex items-center gap-3 mt-1"><span class="text-4xl">🔥</span><span class="text-2xl font-black">12 days</span></div>
+            <div class="text-xs text-textMuted">keep it going</div>
+          </div>
+          <div class="absolute top-1/2 -right-3 transform -translate-y-1/2 animate-float glass-card rounded-2xl p-4 max-w-xs border border-primary/20" style="animation-delay:0.8s">
+            <div class="text-[10px] font-bold text-primary tracking-widest uppercase">daily progress</div>
+            <div class="text-3xl font-black mt-1">78%</div>
+            <div class="mt-1 h-1 w-full bg-borderDim/50 rounded-full overflow-hidden"><div class="h-full w-[78%] bg-primary"></div></div>
+            <div class="text-xs text-textMuted mt-1">5 of 6 tasks</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FEATURES ===== -->
+  <section id="features" class="py-20 px-4 relative">
+    <div class="max-w-7xl mx-auto">
+      <div class="text-center mb-14">
+        <span class="text-xs font-bold text-primary tracking-[0.25em] uppercase">× features</span>
+        <h2 class="text-4xl md:text-5xl font-black mt-2 text-textLight">Complete Fitness Control</h2>
+        <p class="text-lg text-textMuted max-w-2xl mx-auto mt-2 font-light">Everything you need to build, track, and maintain your fitness journey.</p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-5">
+        <div class="md:col-span-6 group relative h-72 rounded-2xl overflow-hidden border border-borderDim/40 hover:border-primary/40 transition-all duration-300 shadow-xl hover-lift">
+          <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=600&h=400&fit=crop&crop=center" alt="workout" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+          <div class="absolute inset-0 img-overlay"></div>
+          <div class="absolute bottom-0 left-0 right-0 p-7">
+            <span class="text-xs font-bold text-primary tracking-widest uppercase">adaptive training</span>
+            <h3 class="text-2xl font-black mt-1">Personalized Workouts</h3>
+            <p class="text-textMuted text-sm">AI-designed plans that scale with your progress.</p>
+          </div>
+        </div>
+        <div class="md:col-span-6 space-y-5">
+          <div class="group relative h-[136px] rounded-2xl overflow-hidden border border-borderDim/40 hover:border-primary/40 transition-all duration-300 hover-lift">
+            <img src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=600&h=300&fit=crop&crop=center" alt="nutrition" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+            <div class="absolute inset-0 img-overlay-light"></div>
+            <div class="absolute inset-0 p-6 flex flex-col justify-center">
+              <span class="text-xs font-bold text-primary tracking-widest uppercase">meal planning</span>
+              <h3 class="text-xl font-black">Smart Nutrition</h3>
+            </div>
+          </div>
+          <div class="group relative h-[136px] rounded-2xl overflow-hidden border border-borderDim/40 hover:border-primary/40 transition-all duration-300 hover-lift">
+            <img src="https://images.unsplash.com/photo-1545205597-3d9d02c29597?w=600&h=300&fit=crop&crop=center" alt="habits" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+            <div class="absolute inset-0 img-overlay-light"></div>
+            <div class="absolute inset-0 p-6 flex flex-col justify-center">
+              <span class="text-xs font-bold text-primary tracking-widest uppercase">daily tracking</span>
+              <h3 class="text-xl font-black">Build Habits</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-5 mt-5">
+        <div class="md:col-span-4 group rounded-2xl border border-borderDim/40 hover:border-primary/40 transition-all duration-300 bg-gradient-to-br from-card to-dark p-7 flex flex-col justify-center h-56 hover-lift">
+          <span class="text-3xl">📊</span>
+          <span class="text-xs font-bold text-primary tracking-widest uppercase mt-3">insights</span>
+          <h3 class="text-xl font-black">Progress Dashboard</h3>
+          <p class="text-sm text-textMuted">Real-time metrics & streaks.</p>
+        </div>
+        <div class="md:col-span-4 group rounded-2xl border border-borderDim/40 hover:border-primary/40 transition-all duration-300 bg-gradient-to-br from-card to-dark p-7 flex flex-col justify-center h-56 hover-lift">
+          <span class="text-3xl">🤖</span>
+          <span class="text-xs font-bold text-primary tracking-widest uppercase mt-3">AI coaching</span>
+          <h3 class="text-xl font-black">Smart Coach</h3>
+          <p class="text-sm text-textMuted">Real-time guidance & feedback.</p>
+        </div>
+        <div class="md:col-span-4 group rounded-2xl border border-borderDim/40 hover:border-primary/40 transition-all duration-300 bg-gradient-to-br from-card to-dark p-7 flex flex-col justify-center h-56 hover-lift">
+          <span class="text-3xl">⚡</span>
+          <span class="text-xs font-bold text-primary tracking-widest uppercase mt-3">performance</span>
+          <h3 class="text-xl font-black">Real Results</h3>
+          <p class="text-sm text-textMuted">Measurable gains in 4 weeks.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== WORKOUTS ===== -->
+  <section id="workouts" class="py-20 px-4 scroll-mt-24">
+    <div class="max-w-7xl mx-auto">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <div>
+          <span class="text-xs font-bold text-primary tracking-[0.25em] uppercase">× training programs</span>
+          <h2 class="text-4xl md:text-5xl font-black mt-2">Your Training.<br />Your Goal.<br />Your Pace.</h2>
+          <p class="text-lg text-textMuted mt-4 max-w-xl font-light">Choose your focus, follow guided sessions that scale with your level.</p>
+          <div class="mt-8 grid grid-cols-2 gap-3">
+            <div class="group rounded-xl border border-borderDim/40 hover:border-primary/50 p-4 bg-card/40 hover:bg-card transition-all cursor-pointer hover-lift">
+              <div class="text-2xl">💪</div>
+              <div class="text-[10px] font-bold text-primary tracking-widest uppercase mt-1">Strength</div>
+              <div class="font-black text-lg">45 min</div>
+              <div class="text-xs text-textMuted">Intermediate</div>
+              <div class="mt-2 h-1 bg-borderDim/50 rounded-full"><div class="h-full w-3/4 bg-primary"></div></div>
+            </div>
+            <div class="group rounded-xl border border-borderDim/40 hover:border-primary/50 p-4 bg-card/40 hover:bg-card transition-all cursor-pointer hover-lift">
+              <div class="text-2xl">🏃</div>
+              <div class="text-[10px] font-bold text-primary tracking-widest uppercase mt-1">Cardio</div>
+              <div class="font-black text-lg">30 min</div>
+              <div class="text-xs text-textMuted">All levels</div>
+              <div class="mt-2 h-1 bg-borderDim/50 rounded-full"><div class="h-full w-1/2 bg-primary"></div></div>
+            </div>
+            <div class="group rounded-xl border border-borderDim/40 hover:border-primary/50 p-4 bg-card/40 hover:bg-card transition-all cursor-pointer hover-lift">
+              <div class="text-2xl">✨</div>
+              <div class="text-[10px] font-bold text-primary tracking-widest uppercase mt-1">Mobility</div>
+              <div class="font-black text-lg">20 min</div>
+              <div class="text-xs text-textMuted">Recovery</div>
+              <div class="mt-2 h-1 bg-borderDim/50 rounded-full"><div class="h-full w-1/3 bg-primary"></div></div>
+            </div>
+            <div class="group rounded-xl border border-borderDim/40 hover:border-primary/50 p-4 bg-card/40 hover:bg-card transition-all cursor-pointer hover-lift">
+              <div class="text-2xl">⚖️</div>
+              <div class="text-[10px] font-bold text-primary tracking-widest uppercase mt-1">Full Body</div>
+              <div class="font-black text-lg">40 min</div>
+              <div class="text-xs text-textMuted">Balanced</div>
+              <div class="mt-2 h-1 bg-borderDim/50 rounded-full"><div class="h-full w-2/3 bg-primary"></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="relative h-80 sm:h-[450px] rounded-2xl overflow-hidden shadow-2xl shadow-primary/10 border border-borderDim/30 border-pulse">
+          <img src="https://images.unsplash.com/photo-1518611012118-696072aa579a?w=800&h=600&fit=crop&crop=center" alt="workout" class="w-full h-full object-cover" />
+          <div class="absolute inset-0 img-overlay-light"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== NUTRITION ===== -->
+  <section id="nutrition" class="py-20 px-4 scroll-mt-24">
+    <div class="max-w-7xl mx-auto">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <div class="relative h-80 sm:h-[450px] rounded-2xl overflow-hidden shadow-2xl shadow-primary/10 border border-borderDim/30 border-pulse order-2 lg:order-1">
+          <img src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800&h=600&fit=crop&crop=center" alt="nutrition" class="w-full h-full object-cover" />
+          <div class="absolute inset-0 img-overlay-light"></div>
+        </div>
+        <div class="order-1 lg:order-2">
+          <span class="text-xs font-bold text-primary tracking-[0.25em] uppercase">× meal planning</span>
+          <h2 class="text-4xl md:text-5xl font-black mt-2">Eat with Purpose</h2>
+          <p class="text-lg text-textMuted mt-4 max-w-xl font-light">Meal strategies that match your training load, quick & balanced.</p>
+          <div class="mt-8 grid grid-cols-2 gap-3">
+            <div class="rounded-xl border border-borderDim/40 hover:border-primary/40 p-4 bg-card/40 hover:bg-card transition-all text-center cursor-pointer hover-lift">
+              <div class="text-2xl">🥞</div>
+              <div class="text-[10px] font-bold text-primary tracking-widest uppercase mt-1">Breakfast</div>
+              <div class="font-bold">Protein + Carbs</div>
+              <div class="text-xs text-textMuted">480 kcal</div>
+            </div>
+            <div class="rounded-xl border border-borderDim/40 hover:border-primary/40 p-4 bg-card/40 hover:bg-card transition-all text-center cursor-pointer hover-lift">
+              <div class="text-2xl">🥗</div>
+              <div class="text-[10px] font-bold text-primary tracking-widest uppercase mt-1">Lunch</div>
+              <div class="font-bold">Balanced Plate</div>
+              <div class="text-xs text-textMuted">650 kcal</div>
+            </div>
+            <div class="rounded-xl border border-borderDim/40 hover:border-primary/40 p-4 bg-card/40 hover:bg-card transition-all text-center cursor-pointer hover-lift">
+              <div class="text-2xl">🐟</div>
+              <div class="text-[10px] font-bold text-primary tracking-widest uppercase mt-1">Dinner</div>
+              <div class="font-bold">Recovery Focused</div>
+              <div class="text-xs text-textMuted">720 kcal</div>
+            </div>
+            <div class="rounded-xl border border-borderDim/40 hover:border-primary/40 p-4 bg-card/40 hover:bg-card transition-all text-center cursor-pointer hover-lift">
+              <div class="text-2xl">🌰</div>
+              <div class="text-[10px] font-bold text-primary tracking-widest uppercase mt-1">Snacks</div>
+              <div class="font-bold">Smart Bites</div>
+              <div class="text-xs text-textMuted">250 kcal</div>
+            </div>
+          </div>
+          <div class="mt-6 p-5 rounded-xl border border-primary/20 bg-card/30 backdrop-blur-sm glow-orange">
+            <div class="flex items-center gap-3"><span class="text-xl">🎯</span><span class="font-bold text-primary text-xs tracking-widest uppercase">Daily target</span></div>
+            <div class="flex items-baseline gap-2"><span class="text-3xl font-black text-primary">2,100</span><span class="text-textMuted text-sm">kcal</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== HABITS ===== -->
+  <section id="habits" class="py-20 px-4 scroll-mt-24">
+    <div class="max-w-7xl mx-auto">
+      <div class="relative rounded-2xl overflow-hidden shadow-2xl shadow-primary/10 border border-borderDim/30 border-pulse">
+        <img src="https://images.unsplash.com/photo-1545205597-3d9d02c29597?w=1200&h=400&fit=crop&crop=center" alt="habits" class="w-full h-64 object-cover" />
+        <div class="absolute inset-0 img-overlay"></div>
+        <div class="absolute inset-0 p-8 sm:p-10 flex flex-col justify-end">
+          <span class="text-xs font-bold text-primary tracking-[0.25em] uppercase">× daily habits</span>
+          <h2 class="text-3xl sm:text-4xl md:text-5xl font-black mt-2">Build Consistency,<br />Transform Your Life</h2>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 max-w-3xl">
+            <div class="glass-card rounded-xl p-4 border border-primary/20 hover:border-primary/40 transition-all">
+              <div class="text-[10px] font-bold text-primary tracking-widest uppercase">Water</div>
+              <div class="text-2xl font-black">6 / 8</div>
+              <div class="mt-1 h-1 bg-borderDim/50 rounded-full"><div class="h-full w-3/4 bg-primary"></div></div>
+            </div>
+            <div class="glass-card rounded-xl p-4 border border-primary/20 hover:border-primary/40 transition-all">
+              <div class="text-[10px] font-bold text-primary tracking-widest uppercase">Workouts</div>
+              <div class="text-2xl font-black">4 / 4</div>
+              <div class="mt-1 h-1 bg-borderDim/50 rounded-full"><div class="h-full w-full bg-primary"></div></div>
+            </div>
+            <div class="glass-card rounded-xl p-4 border border-primary/20 hover:border-primary/40 transition-all">
+              <div class="text-[10px] font-bold text-primary tracking-widest uppercase">Meals</div>
+              <div class="text-2xl font-black">3 / 3</div>
+              <div class="mt-1 h-1 bg-borderDim/50 rounded-full"><div class="h-full w-full bg-primary"></div></div>
+            </div>
+            <div class="glass-card rounded-xl p-4 border border-primary/20 hover:border-primary/40 transition-all">
+              <div class="text-[10px] font-bold text-primary tracking-widest uppercase">Streak</div>
+              <div class="text-2xl font-black">🔥 12</div>
+              <div class="text-xs text-textMuted">keep going</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PROGRESS ===== -->
+  <section id="progress" class="py-20 px-4 scroll-mt-24">
+    <div class="max-w-7xl mx-auto">
+      <div class="text-center mb-14">
+        <span class="text-xs font-bold text-primary tracking-[0.25em] uppercase">× your progress</span>
+        <h2 class="text-4xl md:text-5xl font-black mt-2">Real Results. Real Progress.</h2>
+        <p class="text-lg text-textMuted max-w-2xl mx-auto mt-2 font-light">Track every milestone, celebrate every win.</p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div class="rounded-xl border border-borderDim/40 hover:border-primary/50 p-6 bg-card/40 hover:bg-card transition-all shadow-xl hover-lift">
+          <div class="flex items-center justify-between"><span class="text-[10px] font-bold text-primary tracking-widest uppercase">Weekly</span><span class="text-xl">📅</span></div>
+          <div class="text-4xl font-black text-primary mt-3">75%</div>
+          <div class="text-sm text-textMuted">completion</div>
+          <div class="mt-3 h-1.5 bg-borderDim/50 rounded-full"><div class="h-full w-3/4 bg-primary"></div></div>
+        </div>
+        <div class="rounded-xl border border-borderDim/40 hover:border-primary/50 p-6 bg-card/40 hover:bg-card transition-all shadow-xl hover-lift">
+          <div class="flex items-center justify-between"><span class="text-[10px] font-bold text-primary tracking-widest uppercase">Streak</span><span class="text-xl">🔥</span></div>
+          <div class="text-4xl font-black text-primary mt-3">12</div>
+          <div class="text-sm text-textMuted">days consistency</div>
+          <div class="mt-3 h-1.5 bg-borderDim/50 rounded-full"><div class="h-full w-4/5 bg-primary"></div></div>
+        </div>
+        <div class="rounded-xl border border-borderDim/40 hover:border-primary/50 p-6 bg-card/40 hover:bg-card transition-all shadow-xl hover-lift">
+          <div class="flex items-center justify-between"><span class="text-[10px] font-bold text-primary tracking-widest uppercase">BMI</span><span class="text-xl">⚖️</span></div>
+          <div class="text-4xl font-black text-primary mt-3">—</div>
+          <div class="text-sm text-textMuted">body composition</div>
+          <div class="mt-3 text-xs text-textMuted">BMI will appear</div>
+        </div>
+        <div class="rounded-xl border border-borderDim/40 hover:border-primary/50 p-6 bg-card/40 hover:bg-card transition-all shadow-xl hover-lift">
+          <div class="flex items-center justify-between"><span class="text-[10px] font-bold text-primary tracking-widest uppercase">Calories</span><span class="text-xl">🔥</span></div>
+          <div class="text-4xl font-black text-primary mt-3">—</div>
+          <div class="text-sm text-textMuted">daily target</div>
+          <div class="mt-3 text-xs text-textMuted">after calculation</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== AI COACH ===== -->
+  <section id="coach" class="py-20 px-4 scroll-mt-24">
+    <div class="max-w-7xl mx-auto">
+      <div class="text-center mb-14">
+        <span class="text-xs font-bold text-primary tracking-[0.25em] uppercase">× AI coaching</span>
+        <h2 class="text-4xl md:text-5xl font-black mt-2">Your Personal AI Coach</h2>
+        <p class="text-lg text-textMuted max-w-2xl mx-auto mt-2 font-light">Get personalized guidance & instant motivation.</p>
+      </div>
+      <div class="max-w-3xl mx-auto">
+        <div class="rounded-2xl border border-borderDim/30 overflow-hidden shadow-2xl glass border-pulse">
+          <div class="bg-gradient-to-r from-primary/10 to-primary/5 border-b border-borderDim/30 p-5 flex items-center gap-4">
+            <div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-xl shadow-lg shadow-primary/20">🤖</div>
+            <div><div class="font-bold">AI Fitness Coach</div><div class="text-sm text-textMuted">always online</div></div>
+          </div>
+          <div id="chatbot-messages" class="h-80 overflow-y-auto bg-dark/40 p-6 space-y-4">
+            <div class="flex gap-3"><div class="w-7 h-7 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 text-xs">🤖</div><div class="max-w-xs glass-card rounded-2xl p-4 border border-borderDim/30"><div class="text-sm">How can I help with your fitness goal today?</div></div></div>
+            <div class="flex justify-end gap-3"><div class="max-w-xs bg-primary/10 rounded-2xl p-4 border border-primary/20"><div class="text-sm">I want to build a workout habit.</div></div><div class="w-7 h-7 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 text-xs">👤</div></div>
+            <div class="flex gap-3"><div class="w-7 h-7 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 text-xs">🤖</div><div class="max-w-xs glass-card rounded-2xl p-4 border border-borderDim/30"><div class="text-sm">Great! Start with 3 sessions/week, 30-min Full Body.</div></div></div>
+          </div>
+          <div class="bg-surface border-t border-borderDim/30 p-4 flex gap-3">
+            <input id="chat-input" type="text" placeholder="Ask the coach..." class="flex-1 rounded-full bg-card/60 border border-borderDim/30 px-5 py-3 text-sm text-textLight placeholder-textMuted focus:outline-none focus:border-primary/50 focus:bg-card transition-all" />
+            <button id="chat-send" class="px-6 py-3 bg-primary text-dark font-bold rounded-full shadow-xl shadow-primary/20 hover:shadow-primary/30 hover:-translate-y-0.5 transition-all">Send</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== HOW IT WORKS ===== -->
+  <section id="how-it-works" class="py-20 px-4 scroll-mt-24">
+    <div class="max-w-7xl mx-auto">
+      <div class="text-center mb-14">
+        <span class="text-xs font-bold text-primary tracking-[0.25em] uppercase">× getting started</span>
+        <h2 class="text-4xl md:text-5xl font-black mt-2">3 Steps to Transform</h2>
+        <p class="text-lg text-textMuted max-w-2xl mx-auto mt-2 font-light">Simple, proven process to build your strongest self.</p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="relative rounded-2xl border border-primary/20 p-8 bg-card/40 text-center hover:border-primary/50 transition-all hover-lift">
+          <div class="absolute -top-5 -left-5 w-12 h-12 bg-primary text-dark rounded-full flex items-center justify-center font-black text-xl shadow-xl shadow-primary/20">01</div>
+          <div class="text-3xl mt-4">🎯</div>
+          <h3 class="text-xl font-bold mt-3">Set Your Goal</h3>
+          <p class="text-textMuted text-sm">Choose your fitness goal: lose weight, build strength, stay active.</p>
+        </div>
+        <div class="relative rounded-2xl border border-primary/20 p-8 bg-card/40 text-center hover:border-primary/50 transition-all hover-lift">
+          <div class="absolute -top-5 -left-5 w-12 h-12 bg-primary text-dark rounded-full flex items-center justify-center font-black text-xl shadow-xl shadow-primary/20">02</div>
+          <div class="text-3xl mt-4">📋</div>
+          <h3 class="text-xl font-bold mt-3">Build Your Plan</h3>
+          <p class="text-textMuted text-sm">Personalized workout schedule, meal framework, daily habits.</p>
+        </div>
+        <div class="relative rounded-2xl border border-primary/20 p-8 bg-card/40 text-center hover:border-primary/50 transition-all hover-lift">
+          <div class="absolute -top-5 -left-5 w-12 h-12 bg-primary text-dark rounded-full flex items-center justify-center font-black text-xl shadow-xl shadow-primary/20">03</div>
+          <div class="text-3xl mt-4">📊</div>
+          <h3 class="text-xl font-bold mt-3">Track & Transform</h3>
+          <p class="text-textMuted text-sm">Complete daily tasks, watch your streak grow, celebrate milestones.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FINAL CTA ===== -->
+  <section class="py-20 px-4 relative overflow-hidden">
+    <div class="max-w-7xl mx-auto relative z-10">
+      <div class="relative rounded-2xl overflow-hidden shadow-2xl shadow-primary/20 border border-borderDim/30 border-pulse">
+        <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1200&h=400&fit=crop&crop=center" alt="transform" class="w-full h-64 object-cover" />
+        <div class="absolute inset-0 img-overlay"></div>
+        <div class="absolute inset-0 p-12 flex flex-col items-center justify-center text-center">
+          <h2 class="text-4xl md:text-6xl font-black leading-tight">Your Stronger <br /><span class="gradient-text">Self Starts Now.</span></h2>
+          <p class="text-lg text-textMuted max-w-2xl mx-auto mt-3 font-light">Join thousands building real strength, real habits, real results.</p>
+          <a href="signup.html" class="inline-flex items-center px-10 py-4 mt-6 bg-primary text-dark font-bold text-lg rounded-xl shadow-2xl shadow-primary/30 hover:shadow-primary/50 hover:-translate-y-0.5 transition-all duration-300">START YOUR JOURNEY <span class="ml-2">→</span></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="border-t border-borderDim/30 py-14 px-4 bg-surface/40 mt-8">
+    <div class="max-w-7xl mx-auto">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-10 mb-10">
+        <div>
+          <div class="flex items-center gap-3"><div class="w-9 h-9 rounded-xl bg-primary text-dark flex items-center justify-center font-black">AF</div><div><div class="font-bold">AI FITNESS COACH</div><div class="text-xs text-textMuted">Premium Training</div></div></div>
+          <p class="text-sm text-textMuted mt-4">Transform with AI-powered coaching and real-world habits.</p>
+        </div>
+        <div><div class="font-bold uppercase text-xs tracking-wider text-textMuted mb-4">Product</div><ul class="space-y-2 text-sm text-textMuted"><li><a href="#features" class="link-underline hover:text-primary transition-colors">Features</a></li><li><a href="#workouts" class="link-underline hover:text-primary transition-colors">Workouts</a></li><li><a href="#progress" class="link-underline hover:text-primary transition-colors">Progress</a></li><li><a href="#coach" class="link-underline hover:text-primary transition-colors">AI Coach</a></li></ul></div>
+        <div><div class="font-bold uppercase text-xs tracking-wider text-textMuted mb-4">Resources</div><ul class="space-y-2 text-sm text-textMuted"><li><a href="#" class="link-underline hover:text-primary transition-colors">Blog</a></li><li><a href="#" class="link-underline hover:text-primary transition-colors">Help Center</a></li><li><a href="#" class="link-underline hover:text-primary transition-colors">Privacy Policy</a></li><li><a href="#" class="link-underline hover:text-primary transition-colors">Terms</a></li></ul></div>
+        <div><div class="font-bold uppercase text-xs tracking-wider text-textMuted mb-4">Connect</div><ul class="space-y-2 text-sm text-textMuted"><li><a href="#" class="link-underline hover:text-primary transition-colors">Twitter</a></li><li><a href="#" class="link-underline hover:text-primary transition-colors">Instagram</a></li><li><a href="#" class="link-underline hover:text-primary transition-colors">LinkedIn</a></li><li><a href="#" class="link-underline hover:text-primary transition-colors">Discord</a></li></ul></div>
+      </div>
+      <div class="border-t border-borderDim/30 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-textMuted">
+        <div>&copy; 2024 AI Fitness Coach. All rights reserved.</div>
+        <div class="flex gap-6"><a href="#" class="link-underline hover:text-primary transition-colors">Privacy</a><a href="#" class="link-underline hover:text-primary transition-colors">Terms</a><a href="#" class="link-underline hover:text-primary transition-colors">Cookies</a></div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- scripts (preserved) -->
+  <script type="module" src="js/auth.js"></script>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
